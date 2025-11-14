@@ -1,4 +1,4 @@
-package kr.kro.moonlightmoist.shopapi.controller;
+package kr.kro.moonlightmoist.shopapi.aws.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

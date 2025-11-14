@@ -1,4 +1,4 @@
-package kr.kro.moonlightmoist.shopapi.config;
+package kr.kro.moonlightmoist.shopapi.common.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
