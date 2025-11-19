@@ -59,33 +59,31 @@ class CartProductRepositoryUnitTest {
     @Autowired
     ProductOptionRepository productOptionRepository;
 
+    private UserGrade userGrade;
+    private User user;
+    private Category category;
+    private Brand brand;
+    private Product product;
+    private ProductOption productOption;
+    private Cart cart;
+
+    @BeforeEach
+    public void init() {
+        userGrade = userGradeRepository.save(EntityFactory.createUserGrade());
+        user = userRepository.save(EntityFactory.createUser(userGrade));
+        category = categoryRepository.save(EntityFactory.createCategory("카테고리",0,0));
+        brand = brandRepository.save(EntityFactory.createBrand("브랜드"));
+        product = productRepository.save(EntityFactory.createProduct(category, brand));
+        productOption = productOptionRepository.save(EntityFactory.createProductOption("옵션", product));
+        cart = cartRepository.save(EntityFactory.createCart(user));
+    }
+
     @Test
     @DisplayName("장바구니 상품 등록 테스트")
     public void registerCartProductTest() {
-        UserGrade userGrade = EntityFactory.createUserGrade();
-        UserGrade savedUserGrade = userGradeRepository.save(userGrade);
-
-        User user = EntityFactory.createUser(savedUserGrade);
-        User savedUser = userRepository.save(user);
-
-        Category category = EntityFactory.createCategory("메이크업", 0, 0);
-        Category savedCategory = categoryRepository.save(category);
-
-        Brand brand = EntityFactory.createBrand("이니스프리");
-        Brand savedBrand = brandRepository.save(brand);
-
-        Product product = EntityFactory.createProduct(savedCategory, savedBrand);
-        Product savedProduct = productRepository.save(product);
-
-        ProductOption productOption = EntityFactory.createProductOption("옵션1", savedProduct);
-        ProductOption savedProductOption = productOptionRepository.save(productOption);
-
-        Cart cart = EntityFactory.createCart(savedUser);
-        Cart savedCart = cartRepository.save(cart);
-
         CartProduct cartProduct = CartProduct.builder()
-                .cart(savedCart)
-                .productOption(savedProductOption)
+                .cart(cart)
+                .productOption(productOption)
                 .quantity(2)
                 .build();
         CartProduct savedCartProduct = cartProductRepository.save(cartProduct);
@@ -101,31 +99,9 @@ class CartProductRepositoryUnitTest {
     @Test
     @DisplayName("장바구니 상품 조회 테스트")
     public void checkCartProductTest() {
-        UserGrade userGrade = EntityFactory.createUserGrade();
-        UserGrade savedUserGrade = userGradeRepository.save(userGrade);
-
-        User user = EntityFactory.createUser(savedUserGrade);
-        User savedUser = userRepository.save(user);
-
-
-        Category category = EntityFactory.createCategory("메이크업", 0, 0);
-        Category savedCategory = categoryRepository.save(category);
-
-        Brand brand = EntityFactory.createBrand("이니스프리");
-        Brand savedBrand = brandRepository.save(brand);
-
-        Product product = EntityFactory.createProduct(savedCategory, savedBrand);
-        Product savedProduct = productRepository.save(product);
-
-        ProductOption productOption = EntityFactory.createProductOption("옵션2", savedProduct);
-        ProductOption savedProductOption = productOptionRepository.save(productOption);
-
-        Cart cart = EntityFactory.createCart(savedUser);
-        Cart savedCart = cartRepository.save(cart);
-
         CartProduct cartProduct = CartProduct.builder()
-                .cart(savedCart)
-                .productOption(savedProductOption)
+                .cart(cart)
+                .productOption(productOption)
                 .quantity(2)
                 .build();
         CartProduct savedCartProduct = cartProductRepository.save(cartProduct);
@@ -143,31 +119,9 @@ class CartProductRepositoryUnitTest {
     @Test
     @DisplayName("장바구니 상품 수량 변경 테스트")
     public void changeQuantityTest() {
-        UserGrade userGrade = EntityFactory.createUserGrade();
-        UserGrade savedUserGrade = userGradeRepository.save(userGrade);
-
-        User user = EntityFactory.createUser(savedUserGrade);
-        User savedUser = userRepository.save(user);
-
-
-        Category category = EntityFactory.createCategory("메이크업", 0, 0);
-        Category savedCategory = categoryRepository.save(category);
-
-        Brand brand = EntityFactory.createBrand("이니스프리");
-        Brand savedBrand = brandRepository.save(brand);
-
-        Product product = EntityFactory.createProduct(savedCategory, savedBrand);
-        Product savedProduct = productRepository.save(product);
-
-        ProductOption productOption = EntityFactory.createProductOption("옵션1", savedProduct);
-        ProductOption savedProductOption = productOptionRepository.save(productOption);
-
-        Cart cart = EntityFactory.createCart(savedUser);
-        Cart savedCart = cartRepository.save(cart);
-
         CartProduct cartProduct = CartProduct.builder()
-                .cart(savedCart)
-                .productOption(savedProductOption)
+                .cart(cart)
+                .productOption(productOption)
                 .quantity(2)
                 .build();
         CartProduct savedCartProduct = cartProductRepository.save(cartProduct);
@@ -188,31 +142,9 @@ class CartProductRepositoryUnitTest {
     @Test
     @DisplayName("장바구니 상품 삭제 테스트")
     public void deleteCartProduct() {
-        UserGrade userGrade = EntityFactory.createUserGrade();
-        UserGrade savedUserGrade = userGradeRepository.save(userGrade);
-
-        User user = EntityFactory.createUser(savedUserGrade);
-        User savedUser = userRepository.save(user);
-
-
-        Category category = EntityFactory.createCategory("메이크업", 0, 0);
-        Category savedCategory = categoryRepository.save(category);
-
-        Brand brand = EntityFactory.createBrand("이니스프리");
-        Brand savedBrand = brandRepository.save(brand);
-
-        Product product = EntityFactory.createProduct(savedCategory, savedBrand);
-        Product savedProduct = productRepository.save(product);
-
-        ProductOption productOption = EntityFactory.createProductOption("옵션1", savedProduct);
-        ProductOption savedProductOption = productOptionRepository.save(productOption);
-
-        Cart cart = EntityFactory.createCart(savedUser);
-        Cart savedCart = cartRepository.save(cart);
-
         CartProduct cartProduct = CartProduct.builder()
-                .cart(savedCart)
-                .productOption(savedProductOption)
+                .cart(cart)
+                .productOption(productOption)
                 .quantity(2)
                 .build();
         CartProduct savedCartProduct = cartProductRepository.save(cartProduct);

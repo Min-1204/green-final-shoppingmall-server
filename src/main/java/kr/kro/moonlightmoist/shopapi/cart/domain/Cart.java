@@ -6,6 +6,8 @@ import kr.kro.moonlightmoist.shopapi.user.domain.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @ToString
@@ -21,5 +23,17 @@ public class Cart extends BaseTimeEntity {
     @OneToOne
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<CartProduct> cartProducts = new ArrayList<>();
+
+    public void addCartProduct(CartProduct cartProduct) {
+        cartProducts.add(cartProduct);
+    }
+    public void removeCartProduct(CartProduct cartProduct){
+        cartProducts.remove(cartProduct);
+    }
+
 
 }
