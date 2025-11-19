@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@ToString(exclude = {"productOptions", "mainImages", "detailImages"})
 @Getter
 @Builder
 @Setter
@@ -83,6 +83,17 @@ public class Product extends BaseTimeEntity {
 
     public void deleteProduct() {
         this.deleted = true;
+        this.productOptions.forEach(ProductOption::deleteProductOption);
     }
-}
 
+    public void addProductOption(ProductOption option) {
+        productOptions.add(option);
+        option.setProduct(this);
+    }
+
+    public void removeProductOption(ProductOption option) {
+        productOptions.remove(option);
+        option.setProduct(null);
+    }
+
+}

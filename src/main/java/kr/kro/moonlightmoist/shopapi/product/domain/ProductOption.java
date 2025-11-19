@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Getter
+@Setter
 @ToString
 @Table(name = "product_options")
 public class ProductOption extends BaseTimeEntity {
@@ -48,7 +49,11 @@ public class ProductOption extends BaseTimeEntity {
     private int displayOrder;
 
     @Column(name = "is_deleted", nullable = false)
-    private boolean deleted;
+    @Builder.Default
+    private boolean deleted = false;
 
+    public void deleteProductOption() {
+        this.deleted = true;
+    }
 }
 
