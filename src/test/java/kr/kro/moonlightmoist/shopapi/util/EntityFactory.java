@@ -4,6 +4,7 @@ import kr.kro.moonlightmoist.shopapi.brand.domain.Brand;
 import kr.kro.moonlightmoist.shopapi.category.domain.Category;
 import kr.kro.moonlightmoist.shopapi.product.domain.ExposureStatus;
 import kr.kro.moonlightmoist.shopapi.product.domain.Product;
+import kr.kro.moonlightmoist.shopapi.product.domain.ProductOption;
 import kr.kro.moonlightmoist.shopapi.product.domain.SaleStatus;
 import kr.kro.moonlightmoist.shopapi.user.domain.User;
 import kr.kro.moonlightmoist.shopapi.user.domain.UserGrade;
@@ -70,6 +71,20 @@ public class EntityFactory {
                 .smsAgreement(false)
                 .userGrade(userGrade)
                 .userRole(UserRole.USER)
+                .build();
+    }
+
+    public static ProductOption createProductOption (String name, Product product) {
+        return ProductOption.builder()
+                .product(product)
+                .optionName(name)
+                .purchasePrice(1000)
+                .sellingPrice(5000)
+                .currentStock(30)
+                .initialStock(50)
+                .safetyStock(10)
+                .imageUrl("url")
+                .displayOrder(1)
                 .build();
     }
 
