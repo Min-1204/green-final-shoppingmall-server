@@ -1,11 +1,9 @@
 package kr.kro.moonlightmoist.shopapi.user.repository;
 
 import kr.kro.moonlightmoist.shopapi.user.domain.User;
-import kr.kro.moonlightmoist.shopapi.user.domain.UserGrade;
 import kr.kro.moonlightmoist.shopapi.user.domain.UserWithdrawal;
 import kr.kro.moonlightmoist.shopapi.user.domain.UserWithdrawalReason;
 import kr.kro.moonlightmoist.shopapi.util.EntityFactory;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +12,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 
 @DataJpaTest
@@ -27,9 +24,6 @@ class UserWithdrawalRepositoryUnitTest {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private UserGradeRepository userGradeRepository;
 
     @Test
     @DisplayName("회원탈퇴 생성테스트")

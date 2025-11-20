@@ -1,6 +1,5 @@
 package kr.kro.moonlightmoist.shopapi.cart.repository;
 
-import jakarta.persistence.EntityManager;
 import kr.kro.moonlightmoist.shopapi.brand.domain.Brand;
 import kr.kro.moonlightmoist.shopapi.brand.repository.BrandRepository;
 import kr.kro.moonlightmoist.shopapi.cart.domain.Cart;
@@ -12,12 +11,8 @@ import kr.kro.moonlightmoist.shopapi.product.domain.ProductOption;
 import kr.kro.moonlightmoist.shopapi.product.repository.ProductOptionRepository;
 import kr.kro.moonlightmoist.shopapi.product.repository.ProductRepository;
 import kr.kro.moonlightmoist.shopapi.user.domain.User;
-import kr.kro.moonlightmoist.shopapi.user.domain.UserGrade;
-import kr.kro.moonlightmoist.shopapi.user.domain.UserRole;
-import kr.kro.moonlightmoist.shopapi.user.repository.UserGradeRepository;
 import kr.kro.moonlightmoist.shopapi.user.repository.UserRepository;
 import kr.kro.moonlightmoist.shopapi.util.EntityFactory;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,9 +33,6 @@ class CartProductRepositoryUnitTest {
 
     @Autowired
     CartRepository cartRepository;
-
-    @Autowired
-    UserGradeRepository userGradeRepository;
 
     @Autowired
     UserRepository userRepository;
@@ -59,7 +49,6 @@ class CartProductRepositoryUnitTest {
     @Autowired
     ProductOptionRepository productOptionRepository;
 
-    private UserGrade userGrade;
     private User user;
     private Category category;
     private Brand brand;
@@ -69,8 +58,6 @@ class CartProductRepositoryUnitTest {
 
     @BeforeEach
     public void init() {
-        userGrade = userGradeRepository.save(EntityFactory.createUserGrade());
-        user = userRepository.save(EntityFactory.createUser(userGrade));
         category = categoryRepository.save(EntityFactory.createCategory("카테고리",0,0));
         brand = brandRepository.save(EntityFactory.createBrand("브랜드"));
         product = productRepository.save(EntityFactory.createProduct(category, brand));

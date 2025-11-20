@@ -4,11 +4,8 @@ import kr.kro.moonlightmoist.shopapi.order.domain.Order;
 import kr.kro.moonlightmoist.shopapi.policy.deliveryPolicy.domain.DeliveryPolicy;
 import kr.kro.moonlightmoist.shopapi.policy.deliveryPolicy.repository.DeliveryPolicyRepository;
 import kr.kro.moonlightmoist.shopapi.user.domain.User;
-import kr.kro.moonlightmoist.shopapi.user.domain.UserGrade;
-import kr.kro.moonlightmoist.shopapi.user.repository.UserGradeRepository;
 import kr.kro.moonlightmoist.shopapi.user.repository.UserRepository;
 import kr.kro.moonlightmoist.shopapi.util.EntityFactory;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,15 +16,12 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @ActiveProfiles("test")
 @EnableJpaAuditing
 class OrderRepositoryUnitTest {
-    @Autowired
-    UserGradeRepository userGradeRepository;
 
     @Autowired
     UserRepository userRepository;
@@ -38,15 +32,13 @@ class OrderRepositoryUnitTest {
     @Autowired
     OrderRepository orderRepository;
 
-    private UserGrade userGrade;
     private User user;
     private DeliveryPolicy deliveryPolicy;
     private Order order;
 
     @BeforeEach
     public void init() {
-        userGrade = userGradeRepository.save(EntityFactory.createUserGrade());
-        user = userRepository.save(EntityFactory.createUser(userGrade));
+        user = userRepository.save(EntityFactory.createUser());
         deliveryPolicy = deliveryPolicyRepository.save(EntityFactory.createDeliveryPolicy());
         order = orderRepository.save(EntityFactory.createOrder(user,deliveryPolicy));
     }

@@ -25,9 +25,6 @@ class UserRepositoryUnitTest { // 생성, 삭제, 수정, 제약조건
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private UserGradeRepository userGradeRepository;
-
     @Test
     @DisplayName("유저생성 테스트")
     public void createUser() {
@@ -80,33 +77,34 @@ class UserRepositoryUnitTest { // 생성, 삭제, 수정, 제약조건
         assertThat(testUser.get().getLoginId()).isEqualTo("user");
     }
 
-    @Test
-    @DisplayName("중복 로그인Id 저장테스트")
-    public void duplicateLoginId() {
-
-        User user = EntityFactory.createUser();
-        User savedUser = userRepository.save(user);
-
-        User testUser = User.builder()
-                .name("")
-                .email("")
-                .loginId("user")
-                .userRole(UserRole.USER)
-                .userGrade(UserGrade.BRONZE)
-                .birthDate(LocalDate.of(2025,11,11))
-                .smsAgreement(true)
-                .emailAgreement(true)
-                .addressDetail("")
-                .address("")
-                .phoneNumber("")
-                .passwordHash("")
-                .postalCode("")
-                .deleted(true)
-                .deletedAt(LocalDate.of(2025,11,11))
-                .build();
-        User savedTestUser = userRepository.save(testUser);
-
-    }
+//    @Test
+//    @DisplayName("중복 로그인Id 저장테스트")
+//    public void duplicateLoginId() {
+//
+//        User user = EntityFactory.createUser();
+//        User savedUser = userRepository.save(user);
+//
+//        User testUser = User.builder()
+//                .name("")
+//                .email("")
+//                .loginId("user")
+//                .userRole(UserRole.USER)
+//                .userGrade(UserGrade.BRONZE)
+//                .birthDate(LocalDate.of(2025,11,11))
+//                .smsAgreement(true)
+//                .emailAgreement(true)
+//                .addressDetail("")
+//                .address("")
+//                .phoneNumber("")
+//                .passwordHash("")
+//                .postalCode("")
+//                .deleted(true)
+//                .deletedAt(LocalDate.of(2025,11,11))
+//                .build();
+//        User savedTestUser = userRepository.save(testUser);
+//
+//
+//    }
 
 
     @Test

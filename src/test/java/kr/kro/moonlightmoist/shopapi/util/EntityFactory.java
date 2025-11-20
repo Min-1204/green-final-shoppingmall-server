@@ -2,7 +2,6 @@ package kr.kro.moonlightmoist.shopapi.util;
 
 import kr.kro.moonlightmoist.shopapi.brand.domain.Brand;
 import kr.kro.moonlightmoist.shopapi.cart.domain.Cart;
-import kr.kro.moonlightmoist.shopapi.cart.domain.CartProduct;
 import kr.kro.moonlightmoist.shopapi.category.domain.Category;
 import kr.kro.moonlightmoist.shopapi.helpcenter.domain.Faq;
 import kr.kro.moonlightmoist.shopapi.helpcenter.domain.InquiryType;
