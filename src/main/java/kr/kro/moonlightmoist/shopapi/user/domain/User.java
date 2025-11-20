@@ -64,7 +64,7 @@ public class User extends BaseTimeEntity {
     private UserRole userRole;
 
     // 여러명의 유저는 회원등급을 가진다.
-    @Enumerated(EntityType.STRING)
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserGrade userGrade; // 회원 등급
 

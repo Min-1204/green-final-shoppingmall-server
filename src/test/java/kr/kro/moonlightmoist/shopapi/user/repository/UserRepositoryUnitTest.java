@@ -144,6 +144,11 @@ class UserRepositoryUnitTest { // 생성, 삭제, 수정, 제약조건
 
         userRepository.save(savedUser);
 
+        assertThat(savedUser.getAddress()).isEqualTo("주소변경");
+        assertThat(savedUser.getAddressDetail()).isEqualTo("상세주소변경");
+        assertThat(savedUser.isEmailAgreement()).isFalse();
+        assertThat(savedUser.isSmsAgreement()).isFalse();
+
 
     }
 

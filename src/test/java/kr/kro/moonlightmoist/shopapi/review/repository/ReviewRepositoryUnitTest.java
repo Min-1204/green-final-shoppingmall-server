@@ -9,7 +9,7 @@ import kr.kro.moonlightmoist.shopapi.review.domain.Review;
 import kr.kro.moonlightmoist.shopapi.review.domain.ReviewComment;
 import kr.kro.moonlightmoist.shopapi.review.domain.ReviewImage;
 import kr.kro.moonlightmoist.shopapi.review.domain.ReviewLike;
-import kr.kro.moonlightmoist.shopapi.uil.EntityFactory;
+import kr.kro.moonlightmoist.shopapi.util.EntityFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
