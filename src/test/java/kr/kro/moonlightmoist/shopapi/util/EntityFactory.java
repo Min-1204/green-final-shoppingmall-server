@@ -11,6 +11,9 @@ import kr.kro.moonlightmoist.shopapi.product.domain.ExposureStatus;
 import kr.kro.moonlightmoist.shopapi.product.domain.Product;
 import kr.kro.moonlightmoist.shopapi.product.domain.ProductOption;
 import kr.kro.moonlightmoist.shopapi.product.domain.SaleStatus;
+import kr.kro.moonlightmoist.shopapi.review.domain.Review;
+import kr.kro.moonlightmoist.shopapi.review.domain.ReviewComment;
+import kr.kro.moonlightmoist.shopapi.review.domain.ReviewLike;
 import kr.kro.moonlightmoist.shopapi.user.domain.User;
 import kr.kro.moonlightmoist.shopapi.user.domain.UserGrade;
 import kr.kro.moonlightmoist.shopapi.user.domain.UserRole;
@@ -131,5 +134,30 @@ public class EntityFactory {
                 .build();
     }
 
+    public static ReviewComment createReviewComment(Review review){
+        return ReviewComment.builder()
+                .review(review)
+                .visible(true)
+                .deleted(false)
+                .content("리뷰댓글")
+                .build();
+    }
+
+    public static ReviewLike createReviewLike(Review review){
+        return ReviewLike.builder()
+                .review(review)
+                .deleted(false)
+                .build();
+    }
+
+    public static Review createReview(Product product){
+        return Review.builder()
+                .content("리뷰내용1")
+                .rating(5)
+                .visible(true)
+                .deleted(false)
+                .product(product)
+                .build();
+    }
 
 }

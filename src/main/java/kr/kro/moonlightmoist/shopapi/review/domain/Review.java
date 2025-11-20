@@ -7,6 +7,8 @@ import lombok.*;
 import org.hibernate.annotations.Check;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -39,8 +41,18 @@ public class Review extends BaseTimeEntity {
 //    @Column(name="product_id")
 //    private Long productId;
 
-//    @ManyToOne(optional = false)
-//    @JoinColumn(name = "product_id")
-//    private Product product;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "product_id")
+    private Product product;
+
+    @ElementCollection
+    @CollectionTable(name = "review_images", joinColumns = @JoinColumn(name = "review_id"))
+    @Builder.Default
+    private List<ReviewImage> reviewImages = new ArrayList<>();
+
+    public void addImage(ReviewImage image) {
+        image.setOrder(this.reviewImages.size());
+        reviewImages.add(image);
+    }
 
 }

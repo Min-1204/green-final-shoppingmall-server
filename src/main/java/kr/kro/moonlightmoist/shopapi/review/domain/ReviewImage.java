@@ -6,18 +6,13 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity
+@Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @ToString
-@Table(name = "review_images")
-public class ReviewImage extends BaseTimeEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class ReviewImage {
 
     @Column(nullable = false)
     private String imageUrl;
@@ -25,22 +20,8 @@ public class ReviewImage extends BaseTimeEntity {
     @Column(nullable = false)
     private int imageOrder;
 
-    @Column(nullable = false)
-    private String fileName;
-
-    @Column(nullable = false)
-    private int fileSize;
-
-    @Column(name = "is_visible", nullable = false)
-    @Builder.Default
-    private boolean visible = true;
-
-    @Column(name = "is_deleted", nullable = false)
-    @Builder.Default
-    private boolean deleted = false;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name="review_id")
-    private Review review;
+    public void setOrder(int imageOrder) {
+        this.imageOrder = imageOrder;
+    }
 
 }
