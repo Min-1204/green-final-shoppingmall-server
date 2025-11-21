@@ -143,15 +143,17 @@ public class EntityFactory {
                 .build();
     }
 
-    public static ReviewLike createReviewLike(Review review){
+    public static ReviewLike createReviewLike(User user, Review review){
         return ReviewLike.builder()
+                .user(user)
                 .review(review)
                 .deleted(false)
                 .build();
     }
 
-    public static Review createReview(Product product){
+    public static Review createReview(User user, Product product){
         return Review.builder()
+                .user(user)
                 .content("리뷰내용1")
                 .rating(5)
                 .visible(true)

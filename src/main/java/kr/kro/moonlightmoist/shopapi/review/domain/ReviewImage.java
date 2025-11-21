@@ -14,11 +14,9 @@ import java.time.LocalDateTime;
 @ToString
 public class ReviewImage {
 
-    @Column(nullable = false)
     private String imageUrl;
-
-    @Column(nullable = false)
     private int imageOrder;
+    private String fileName;
 
     public void setOrder(int imageOrder) {
         this.imageOrder = imageOrder;

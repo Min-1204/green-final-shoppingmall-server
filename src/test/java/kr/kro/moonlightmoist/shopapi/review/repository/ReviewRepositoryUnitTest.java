@@ -11,6 +11,8 @@ import kr.kro.moonlightmoist.shopapi.review.domain.Review;
 import kr.kro.moonlightmoist.shopapi.review.domain.ReviewComment;
 import kr.kro.moonlightmoist.shopapi.review.domain.ReviewImage;
 import kr.kro.moonlightmoist.shopapi.review.domain.ReviewLike;
+import kr.kro.moonlightmoist.shopapi.user.domain.User;
+import kr.kro.moonlightmoist.shopapi.user.repository.UserRepository;
 import kr.kro.moonlightmoist.shopapi.util.EntityFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,6 +50,9 @@ public class ReviewRepositoryUnitTest {
     ReviewCommentRepository reviewCommentRepository;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
     EntityManager em;
 
     private Brand brand;
@@ -56,14 +61,17 @@ public class ReviewRepositoryUnitTest {
     private ReviewComment reviewComment;
     private ReviewLike reviewLike;
     private Review review;
+    private User user;
 
     @BeforeEach
     public void init() {
         brand = brandRepository.save(EntityFactory.createBrand("브랜드"));
         category = categoryRepository.save(EntityFactory.createCategory("카테고리",0,0));
         product = productRepository.save(EntityFactory.createProduct(category, brand));
+        user = userRepository.save(EntityFactory.createUser());
 
         review = Review.builder()
+                .user(user)
                 .content("리뷰내용1")
                 .rating(5)
                 .visible(true)
@@ -72,7 +80,7 @@ public class ReviewRepositoryUnitTest {
                 .build();
         review = reviewRepository.save(review);
         reviewComment = reviewCommentRepository.save(EntityFactory.createReviewComment(review));
-        reviewLike = reviewLikeRepository.save(EntityFactory.createReviewLike(review));
+        reviewLike = reviewLikeRepository.save(EntityFactory.createReviewLike(user, review));
     }
 
 
@@ -91,6 +99,7 @@ public class ReviewRepositoryUnitTest {
 
         assertThat(foundReview).isPresent();
         assertThat(foundReview.get().getId()).isNotNull();
+        assertThat(foundReview.get().getUser()).isNotNull();
         assertThat(foundReview.get().getContent()).isEqualTo("리뷰내용1");
         assertThat(foundReview.get().getRating()).isEqualTo(5);
         assertThat(foundReview.get().getReviewImages().size()).isEqualTo(1);
@@ -106,12 +115,12 @@ public class ReviewRepositoryUnitTest {
         assertThat(reviewComment.isVisible()).isTrue();
         assertThat(reviewComment.isDeleted()).isFalse();
         assertThat(reviewComment.getReview()).isNotNull();
-        assertThat(reviewComment.getId()).isEqualTo(foundReview.get().getId());
+        assertThat(reviewComment.getReview().getId()).isEqualTo(foundReview.get().getId());
 
         assertThat(reviewLike.getId()).isNotNull();
         assertThat(reviewLike.isDeleted()).isFalse();
         assertThat(reviewLike.getReview()).isNotNull();
-        assertThat(reviewLike.getId()).isEqualTo(foundReview.get().getId());
+        assertThat(reviewLike.getReview().getId()).isEqualTo(foundReview.get().getId());
 
 
     }

@@ -2,6 +2,7 @@ package kr.kro.moonlightmoist.shopapi.review.domain;
 
 import jakarta.persistence.*;
 import kr.kro.moonlightmoist.shopapi.common.domain.BaseTimeEntity;
+import kr.kro.moonlightmoist.shopapi.user.domain.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @ToString
 @Table(name = "review_likes", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"review_id"})
+        @UniqueConstraint(columnNames = {"review_id", "from_user_id"})
 })
 public class ReviewLike extends BaseTimeEntity {
 
@@ -24,6 +25,10 @@ public class ReviewLike extends BaseTimeEntity {
     @Column(name = "is_deleted", nullable = false)
     @Builder.Default
     private boolean deleted = false;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "from_user_id")
+    private User user;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "review_id")

@@ -3,6 +3,7 @@ package kr.kro.moonlightmoist.shopapi.review.domain;
 import jakarta.persistence.*;
 import kr.kro.moonlightmoist.shopapi.common.domain.BaseTimeEntity;
 import kr.kro.moonlightmoist.shopapi.product.domain.Product;
+import kr.kro.moonlightmoist.shopapi.user.domain.User;
 import lombok.*;
 import org.hibernate.annotations.Check;
 
@@ -40,6 +41,10 @@ public class Review extends BaseTimeEntity {
 
 //    @Column(name="product_id")
 //    private Long productId;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "product_id")
