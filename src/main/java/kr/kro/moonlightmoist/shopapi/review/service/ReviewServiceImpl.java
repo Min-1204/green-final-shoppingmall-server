@@ -82,7 +82,19 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public List<ReviewDTO> getList(Long productId) {
-        return List.of();
+        List<Review> reviews = reviewRepository.findByProductId(productId);
+
+        List<ReviewDTO> reviewDto = reviews.stream().map(review -> {
+            return ReviewDTO.builder()
+                    .id(review.getId())
+                    .productId(review.getProduct().getId())
+                    .userId(review.getUser().getId())
+                    .content(review.getContent())
+                    .rating(review.getRating())
+                    .build();
+        }).toList();
+
+        return reviewDto;
     }
 
     @Override

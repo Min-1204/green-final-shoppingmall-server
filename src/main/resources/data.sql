@@ -129,3 +129,14 @@ VALUES
 (3, 'https://dummyimage.com/300x300/000/fff.png&text=PRD3', 0, 0),
 (4, 'https://dummyimage.com/300x300/000/fff.png&text=PRD4', 0, 0),
 (5, 'https://dummyimage.com/300x300/000/fff.png&text=PRD5', 0, 0);
+
+
+-- review 테이블 더미 데이터
+INSERT INTO reviews
+(id, user_id, product_id, content, rating, is_visible, is_deleted, created_at, updated_at)
+VALUES
+(1, 1, 1, '리뷰1', 5, true, false, now(), now()),
+(2, 2, 1, '리뷰2', 4, true, false, now(), now()),
+(3, 3, 1, '리뷰3', 3, true, false, now(), now()),
+(4, 4, 2, '리뷰4', 2, true, false, now(), now()),
+(5, 5, 2, '리뷰5', 1, true, false, now(), now());

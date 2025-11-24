@@ -1,14 +1,14 @@
 package kr.kro.moonlightmoist.shopapi.review.controller;
 
+import kr.kro.moonlightmoist.shopapi.review.domain.Review;
 import kr.kro.moonlightmoist.shopapi.review.dto.ReviewDTO;
 import kr.kro.moonlightmoist.shopapi.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -18,6 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReviewController {
 
     private final ReviewService reviewService;
+
+    @GetMapping("/{productId}")
+    public ResponseEntity<List<ReviewDTO>> getList(@PathVariable("productId") Long productId){
+        List<ReviewDTO> reviews = reviewService.getList(productId);
+        return ResponseEntity.ok(reviews);
+    }
 
     @PostMapping("")
     public ResponseEntity<ReviewDTO> register(@RequestBody ReviewDTO dto){
