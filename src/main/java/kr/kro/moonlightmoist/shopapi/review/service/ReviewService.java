@@ -9,5 +9,6 @@ public interface ReviewService {
 
     List<ReviewDTO> getList(Long productId);
     Long register(ReviewDTO dto);
-
+    ReviewDTO modify(ReviewDTO reviewDTO);
+    void remove(Long reviewId);
 }

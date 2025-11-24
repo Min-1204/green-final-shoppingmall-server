@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -37,47 +38,11 @@ public class ReviewServiceImpl implements ReviewService {
     private final UserRepository userRepository;
 
     public Product getProduct() {
-        Category category = Category.builder()
-                .name("메이크업1")
-                .build();
-        categoryRepository.save(category);
-        Brand brand = Brand.builder()
-                .name("스킨푸드1")
-                .build();
-        brandRepository.save(brand);
-        Product product = Product.builder()
-                .productName("상품1")
-                .brand(brand)
-                .category(category)
-                .cancelable(true)
-                .exposureStatus(ExposureStatus.EXPOSURE)
-                .saleStatus(SaleStatus.ON_SALE)
-                .searchKeywords("메이크업1, 스킨푸드1")
-                .productCode("code1")
-                .build();
-        return productRepository.save(product);
+        return productRepository.findById(1L).get();
     }
 
     public User getUser() {
-        UserGrade userGrade = UserGrade.BRONZE;
-        UserRole userRole = UserRole.USER;
-        User user = User.builder()
-                .loginId("user1234")
-                .password("1234")
-                .name("user")
-                .phoneNumber("012-3456-7890")
-                .email("a@aaa.com")
-                .birthDate(LocalDate.now())
-                .postalCode("123456")
-                .address("그린")
-                .addressDetail("컴퓨터")
-                .emailAgreement(true)
-                .smsAgreement(true)
-                .deleted(false)
-                .userGrade(userGrade)
-                .userRole(userRole)
-                .build();
-        return userRepository.save(user);
+        return userRepository.findById(2L).get();
     }
 
     @Override
@@ -113,6 +78,25 @@ public class ReviewServiceImpl implements ReviewService {
         Review reviewSave = reviewRepository.save(review);
         return reviewSave.getId();
 
+    }
+
+    @Override
+    public ReviewDTO modify(ReviewDTO reviewDTO) {
+        Optional<Review> foundReview = reviewRepository.findById(reviewDTO.getId());
+        Review review = foundReview.orElseThrow();
+
+        review.changeContent(reviewDTO.getContent());
+        review.changeRating(review.getRating());
+
+        return ReviewDTO.builder()
+                .content(review.getContent())
+                .rating(review.getRating())
+                .build();
+    }
+
+    @Override
+    public void remove(Long reviewId) {
+        reviewRepository.deleteById(reviewId);
     }
 
 }

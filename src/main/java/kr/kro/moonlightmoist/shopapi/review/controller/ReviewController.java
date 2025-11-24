@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -19,7 +20,7 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @GetMapping("/{productId}")
+    @GetMapping("/product/{productId}")
     public ResponseEntity<List<ReviewDTO>> getList(@PathVariable("productId") Long productId){
         List<ReviewDTO> reviews = reviewService.getList(productId);
         return ResponseEntity.ok(reviews);
@@ -39,6 +40,27 @@ public class ReviewController {
 
         return ResponseEntity.ok(reviewDTO);
 
+    }
+
+    @PutMapping("/{reviewId}")
+    public ResponseEntity<ReviewDTO> modify(@PathVariable("reviewId") Long reviewId, @RequestBody ReviewDTO dto){
+        log.info("호출, reviewId={}, dto={}", reviewId, dto);
+
+        ReviewDTO reviewUpdated = ReviewDTO.builder()
+                .id(reviewId)
+                .content(dto.getContent())
+                .rating(dto.getRating())
+                .build();
+
+        ReviewDTO modifyReview = reviewService.modify(reviewUpdated);
+
+        return ResponseEntity.ok(modifyReview);
+    }
+
+    @DeleteMapping("/{reviewId}")
+    public Map<String,String> remove(@PathVariable("reviewId") Long reviewId){
+        reviewService.remove(reviewId);
+        return Map.of("RESULT","SUCCESS");
     }
 
 }

@@ -55,6 +55,9 @@ public class Review extends BaseTimeEntity {
     @Builder.Default
     private List<ReviewImage> reviewImages = new ArrayList<>();
 
+    public void changeContent(String content) { this.content=content; }
+    public void changeRating(int rating) { this.rating=rating; }
+
     public void addImage(ReviewImage image) {
         image.setOrder(this.reviewImages.size());
         reviewImages.add(image);
