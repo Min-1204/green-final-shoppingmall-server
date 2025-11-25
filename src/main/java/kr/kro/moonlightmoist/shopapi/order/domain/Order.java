@@ -31,9 +31,10 @@ public class Order extends BaseTimeEntity {
     private String orderNumber;
     @Column(nullable = false)
     private String paymentMethod;
-    @ManyToOne
-    @JoinColumn(name="delivery_policy_id",nullable = true)
-    private DeliveryPolicy deliveryPolicy;
+//    @ManyToOne
+//    @JoinColumn(name="delivery_policy_id",nullable = true)
+//    private DeliveryPolicy deliveryPolicy;
+    //배송비(스냅샷)
     @Column(nullable = false)
     private int deliveryFee;
     //예상 배송일
@@ -52,9 +53,9 @@ public class Order extends BaseTimeEntity {
     @Column(nullable = false)
     private int finalAmount;
     @Column(nullable = false)
-    private String recipientName;
+    private String receiverName;
     @Column(nullable = false)
-    private String recipientPhone;
+    private String receiverPhone;
     @Column(nullable = false)
     private String postalCode;
     @Column(nullable = false)
@@ -68,8 +69,8 @@ public class Order extends BaseTimeEntity {
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted;
 
-    @OneToOne
-    private OrderCoupon orderCoupon;
+//    @OneToOne
+//    private OrderCoupon orderCoupon;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @Builder.Default

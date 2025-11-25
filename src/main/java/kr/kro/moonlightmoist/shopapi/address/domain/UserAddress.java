@@ -2,6 +2,7 @@ package kr.kro.moonlightmoist.shopapi.address.domain;
 
 import jakarta.persistence.*;
 import kr.kro.moonlightmoist.shopapi.common.domain.BaseTimeEntity;
+import kr.kro.moonlightmoist.shopapi.user.domain.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -18,10 +19,9 @@ public class UserAddress extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name="user_id",nullable = false)
-//    // todo : User 클래스 추가해야함
-//    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id",nullable = false)
+    private User user;
     @Column(nullable = false)
     private String addressName;
     @Column(nullable = false)

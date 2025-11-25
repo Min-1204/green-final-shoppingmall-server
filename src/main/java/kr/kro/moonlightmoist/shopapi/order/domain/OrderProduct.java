@@ -28,6 +28,7 @@ public class OrderProduct extends BaseTimeEntity {
     private ProductOption productOption;
     @Column(nullable = false)
     private int quantity;
+    // 1개 가격
     @Column(nullable = false)
     private int purchasedPrice;
     @Enumerated(EnumType.STRING)
