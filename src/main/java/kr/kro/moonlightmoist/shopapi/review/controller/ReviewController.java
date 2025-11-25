@@ -27,17 +27,15 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
-    @GetMapping("/all") //임시 리뷰 목록
-    public ResponseEntity<List<ReviewDTO>> getAllReviews() {
-        List<ReviewDTO> reviews = reviewService.getAll();
-        log.info("getAll 리뷰 결과 => {}", reviews);
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<ReviewDTO>> getMyReviews(@PathVariable Long userId){
+        List<ReviewDTO> reviews = reviewService.getListByUser(userId);
         return ResponseEntity.ok(reviews);
     }
 
     @PostMapping("/reviewAdd")
     public ResponseEntity<ReviewDTO> register(@RequestBody ReviewDTO dto){
         Long id = reviewService.register(dto);
-
         ReviewDTO reviewDTO = ReviewDTO.builder()
                 .id(id)
                 .content(dto.getContent())
@@ -45,23 +43,17 @@ public class ReviewController {
                 .files(dto.getFiles())
                 .uploadFileNames(dto.getUploadFileNames())
                 .build();
-
         return ResponseEntity.ok(reviewDTO);
-
     }
 
     @PutMapping("/{reviewId}")
     public ResponseEntity<ReviewDTO> modify(@PathVariable("reviewId") Long reviewId, @RequestBody ReviewDTO dto){
-        log.info("호출, reviewId={}, dto={}", reviewId, dto);
-
         ReviewDTO reviewUpdated = ReviewDTO.builder()
                 .id(reviewId)
                 .content(dto.getContent())
                 .rating(dto.getRating())
                 .build();
-
         ReviewDTO modifyReview = reviewService.modify(reviewUpdated);
-
         return ResponseEntity.ok(modifyReview);
     }
 

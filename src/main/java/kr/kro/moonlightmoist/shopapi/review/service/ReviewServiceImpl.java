@@ -58,15 +58,17 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<ReviewDTO> getAll() { //임시 리뷰 목록
-        return reviewRepository.findAll().stream()
+    public List<ReviewDTO> getListByUser(Long userId) {
+        List<Review> list = reviewRepository.findByUserId(userId);
+        return list.stream()
                 .map(review -> ReviewDTO.builder()
                         .id(review.getId())
                         .content(review.getContent())
                         .rating(review.getRating())
+                        .userId(review.getUser().getId())
+                        .productId(review.getProduct().getId())
                         .build())
                 .toList();
-
     }
 
     @Override
