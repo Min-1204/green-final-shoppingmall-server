@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ReviewService {
 
-    List<ReviewDTO> getList(Long productId);//임시 리뷰 목록
+    List<ReviewDTO> getList(Long productId, String sort);
     List<ReviewDTO> getListByUser(Long userId);
     Long register(ReviewDTO dto);
     ReviewDTO modify(ReviewDTO reviewDTO);

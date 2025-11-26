@@ -1,15 +1,10 @@
 package kr.kro.moonlightmoist.shopapi.review.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import kr.kro.moonlightmoist.shopapi.product.domain.Product;
-import kr.kro.moonlightmoist.shopapi.user.domain.User;
 import lombok.*;
-import org.hibernate.annotations.Check;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +19,9 @@ public class ReviewDTO {
     private String content;
     private int rating;
     private Long userId;
+    private String loginId;
     private Long productId;
+    private LocalDateTime createdAt;
 
     @Builder.Default
     private List<MultipartFile> files = new ArrayList<>();

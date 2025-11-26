@@ -41,20 +41,40 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<ReviewDTO> getList(Long productId) {
+    public List<ReviewDTO> getList(Long productId, String sort) {
         List<Review> reviews = reviewRepository.findByProductId(productId);
 
-        List<ReviewDTO> reviewDto = reviews.stream().map(review -> {
+        if (sort.equals("latest")) {
+            reviews.sort((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()));
+        } else if (sort.equals("oldest")) {
+            reviews.sort((r1, r2) -> r1.getCreatedAt().compareTo(r2.getCreatedAt()));
+        } else if (sort.equals("ratingDesc")) {
+            reviews.sort((r1, r2) -> {
+                int ratingDesc = r2.getRating() - r1.getRating();
+                if (ratingDesc != 0) return ratingDesc;
+                return r2.getCreatedAt().compareTo(r1.getCreatedAt());
+            }); //내림차순
+        } else if (sort.equals("ratingAsc")) {
+            reviews.sort((r1, r2) -> {
+                int ratingAsc = r1.getRating() - r2.getRating();
+                if (ratingAsc != 0) return ratingAsc;
+                return r1.getCreatedAt().compareTo(r2.getCreatedAt());
+            }); //오름차순
+        }
+
+        List<ReviewDTO> reviewDTO = reviews.stream().map(review -> {
             return ReviewDTO.builder()
                     .id(review.getId())
                     .productId(review.getProduct().getId())
                     .userId(review.getUser().getId())
+                    .loginId(review.getUser().getLoginId())
                     .content(review.getContent())
                     .rating(review.getRating())
+                    .createdAt(review.getCreatedAt())
                     .build();
         }).toList();
 
-        return reviewDto;
+        return reviewDTO;
     }
 
     @Override
@@ -67,6 +87,7 @@ public class ReviewServiceImpl implements ReviewService {
                         .rating(review.getRating())
                         .userId(review.getUser().getId())
                         .productId(review.getProduct().getId())
+                        .createdAt(review.getCreatedAt())
                         .build())
                 .toList();
     }

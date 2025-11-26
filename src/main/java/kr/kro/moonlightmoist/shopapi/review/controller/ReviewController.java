@@ -22,8 +22,11 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping("/product/{productId}")
-    public ResponseEntity<List<ReviewDTO>> getList(@PathVariable("productId") Long productId){
-        List<ReviewDTO> reviews = reviewService.getList(productId);
+    public ResponseEntity<List<ReviewDTO>> getList(
+            @PathVariable("productId") Long productId,
+            @RequestParam(defaultValue = "sort") String sort
+            ){
+        List<ReviewDTO> reviews = reviewService.getList(productId, sort);
         return ResponseEntity.ok(reviews);
     }
 
@@ -33,7 +36,7 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
-    @PostMapping("/reviewAdd")
+    @PostMapping("/add")
     public ResponseEntity<ReviewDTO> register(@RequestBody ReviewDTO dto){
         Long id = reviewService.register(dto);
         ReviewDTO reviewDTO = ReviewDTO.builder()
@@ -46,7 +49,7 @@ public class ReviewController {
         return ResponseEntity.ok(reviewDTO);
     }
 
-    @PutMapping("/{reviewId}")
+    @PutMapping("/modify/{reviewId}")
     public ResponseEntity<ReviewDTO> modify(@PathVariable("reviewId") Long reviewId, @RequestBody ReviewDTO dto){
         ReviewDTO reviewUpdated = ReviewDTO.builder()
                 .id(reviewId)
@@ -57,7 +60,7 @@ public class ReviewController {
         return ResponseEntity.ok(modifyReview);
     }
 
-    @DeleteMapping("/{reviewId}")
+    @DeleteMapping("/delete/{reviewId}")
     public Map<String,String> remove(@PathVariable("reviewId") Long reviewId){
         reviewService.remove(reviewId);
         return Map.of("RESULT","SUCCESS");

@@ -122,8 +122,8 @@ VALUES
 INSERT INTO reviews
 (id, user_id, product_id, content, rating, is_visible, is_deleted, created_at, updated_at)
 VALUES
-(1, 1, 1, '리뷰1', 5, true, false, now(), now()),
-(2, 1, 1, '리뷰2', 4, true, false, now(), now()),
-(3, 1, 2, '리뷰3', 3, true, false, now(), now()),
-(4, 2, 2, '리뷰4', 2, true, false, now(), now()),
-(5, 2, 3, '리뷰5', 1, true, false, now(), now());
+(1, 1, 1, '리뷰1', 5, true, false, '2025-11-20 10:00:00', '2025-11-20 10:00:00'),
+(2, 1, 2, '리뷰2', 4, true, false, '2025-11-20 11:30:00', '2025-11-20 11:30:00'),
+(3, 2, 3, '리뷰3', 3, true, false, '2025-11-22 09:15:00', '2025-11-22 09:15:00'),
+(4, 2, 1, '리뷰4', 2, true, false, '2025-11-23 14:45:00', '2025-11-23 14:45:00'),
+(5, 3, 1, '리뷰5', 1, true, false, '2025-11-26 16:20:00', '2025-11-26 16:20:00');
