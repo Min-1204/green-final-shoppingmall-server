@@ -31,4 +31,6 @@ public class OrderResponseDTO {
     @Builder.Default
     private List<OrderProductResponseDTO> orderProducts = new ArrayList<>();
 
+    private LocalDate orderDate;
+
 }

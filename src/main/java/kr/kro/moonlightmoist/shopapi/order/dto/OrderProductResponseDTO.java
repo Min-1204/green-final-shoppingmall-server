@@ -1,5 +1,6 @@
 package kr.kro.moonlightmoist.shopapi.order.dto;
 
+import kr.kro.moonlightmoist.shopapi.order.domain.OrderProductStatus;
 import kr.kro.moonlightmoist.shopapi.product.domain.ProductMainImage;
 import lombok.*;
 
@@ -21,5 +22,7 @@ public class OrderProductResponseDTO {
     // 상품 갯수
     private int quantity;
     // 상품 썸네일 이미지 url
-    private ProductMainImage imageUrl;
+    private String imageUrl;
+    // 상품 주문 상태(주문 접수, 결제완료, 배송준비중, 배송중, 배송완료)
+    private OrderProductStatus orderProductStatus;
 }

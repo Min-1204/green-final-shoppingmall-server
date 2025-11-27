@@ -8,6 +8,8 @@ import kr.kro.moonlightmoist.shopapi.order.dto.OrderProductResponseDTO;
 import kr.kro.moonlightmoist.shopapi.order.dto.OrderRequestDTO;
 import kr.kro.moonlightmoist.shopapi.order.dto.OrderResponseDTO;
 import kr.kro.moonlightmoist.shopapi.order.repository.OrderRepository;
+import kr.kro.moonlightmoist.shopapi.product.domain.ImageType;
+import kr.kro.moonlightmoist.shopapi.product.domain.ProductMainImage;
 import kr.kro.moonlightmoist.shopapi.product.domain.ProductOption;
 import kr.kro.moonlightmoist.shopapi.product.repository.ProductOptionRepository;
 import kr.kro.moonlightmoist.shopapi.user.domain.User;
@@ -84,6 +86,7 @@ public class OrderServiceImpl implements OrderService{
                 .paymentMethod(order.getPaymentMethod())
                 .totalProductAmount(order.getTotalProductAmount())
                 .postalCode(order.getPostalCode())
+                .orderDate(order.getCreatedAt().toLocalDate())
                 .build();
         for(OrderProduct op : order.getOrderProducts()){
             OrderProductResponseDTO orderProductResponseDTO = OrderProductResponseDTO.builder()
@@ -93,7 +96,8 @@ public class OrderServiceImpl implements OrderService{
                     .productOptionName(op.getProductOption().getOptionName())
                     .purchasedPrice(op.getPurchasedPrice())
                     .quantity(op.getQuantity())
-//                    .imageUrl(op.getProductOption().getProduct().getMainImages().stream().filter(image->image.getImageType()==="THUMBNAIL"))
+                    .imageUrl(op.getProductOption().getProduct().getMainImages().stream().filter(image->image.getImageType() == ImageType.THUMBNAIL).map(ProductMainImage::getImageUrl).findFirst().orElse(null))
+                    .orderProductStatus(op.getOrderProductStatus())
                     .build();
             orderResponseDTO.getOrderProducts().add(orderProductResponseDTO);
         }
@@ -102,6 +106,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public Long createOrder(OrderRequestDTO dto, Long userId) {
+        log.info("OrderService createOrder dto=>{}, userId=>{}",dto,userId);
         User user = userRepository.findById(userId).orElseThrow();
 
         // 1) 주문 번호 생성
