@@ -75,4 +75,13 @@ public class ProductController {
         List<ProductRes> productResList = productService.searchProductsByCategory(depth3CategoryIds);
         return ResponseEntity.ok(productResList);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductRes> getProductById(@PathVariable(name = "id") Long id) {
+
+        ProductRes res = productService.searchProductById(id);
+
+        return ResponseEntity.ok(res);
+    }
+
 }

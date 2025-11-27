@@ -13,6 +13,8 @@ public interface ProductService {
     void addImageUrls(Long id, ProductImagesUrlDTO dto);
     // 카테고리별 상품 조회
     List<ProductRes> searchProductsByCategory(List<Long> depth3CategoryIds);
+    // 상품 단일 조회
+    ProductRes searchProductById(Long id);
     // 상품 수정
     // 상품 삭제
 }
