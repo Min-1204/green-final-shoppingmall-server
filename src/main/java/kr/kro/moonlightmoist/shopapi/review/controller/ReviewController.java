@@ -1,15 +1,17 @@
 package kr.kro.moonlightmoist.shopapi.review.controller;
 
-import kr.kro.moonlightmoist.shopapi.review.domain.Review;
+import kr.kro.moonlightmoist.shopapi.aws.service.S3UploadService;
 import kr.kro.moonlightmoist.shopapi.review.dto.ReviewDTO;
+import kr.kro.moonlightmoist.shopapi.review.dto.ReviewImageUrlDTO;
 import kr.kro.moonlightmoist.shopapi.review.repository.ReviewRepository;
 import kr.kro.moonlightmoist.shopapi.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +25,7 @@ public class ReviewController {
 
     private final ReviewRepository reviewRepository;
     private final ReviewService reviewService;
+    private final S3UploadService s3UploadService;
 
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<ReviewDTO>> getList(
@@ -40,16 +43,24 @@ public class ReviewController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ReviewDTO> register(@RequestBody ReviewDTO dto){
+    public ResponseEntity<String> register(
+            @RequestPart("review") ReviewDTO dto,
+            @RequestPart("reviewImage") List<MultipartFile> reviewImage
+    ){
         Long id = reviewService.register(dto);
-        ReviewDTO reviewDTO = ReviewDTO.builder()
-                .id(id)
-                .content(dto.getContent())
-                .rating(dto.getRating())
-                .files(dto.getFiles())
-                .uploadFileNames(dto.getUploadFileNames())
+
+        ReviewImageUrlDTO reviewImageUrlDTO = ReviewImageUrlDTO.builder()
+                .imageUrls(new ArrayList<>())
                 .build();
-        return ResponseEntity.ok(reviewDTO);
+
+        for(int i=0; i<reviewImage.size(); i++){
+            String url = s3UploadService.uploadOneFile(reviewImage.get(i), "reviews/" + id + "/");
+            reviewImageUrlDTO.getImageUrls().add(url);
+        }
+
+        reviewService.addImageUrls(id, reviewImageUrlDTO);
+
+        return ResponseEntity.ok("성공");
     }
 
     @PutMapping("/modify/{reviewId}")

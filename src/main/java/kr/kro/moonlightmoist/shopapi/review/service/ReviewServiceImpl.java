@@ -6,17 +6,16 @@ import kr.kro.moonlightmoist.shopapi.category.repository.CategoryRepository;
 import kr.kro.moonlightmoist.shopapi.product.domain.Product;
 import kr.kro.moonlightmoist.shopapi.product.repository.ProductRepository;
 import kr.kro.moonlightmoist.shopapi.review.domain.Review;
+import kr.kro.moonlightmoist.shopapi.review.domain.ReviewImage;
 import kr.kro.moonlightmoist.shopapi.review.dto.ReviewDTO;
+import kr.kro.moonlightmoist.shopapi.review.dto.ReviewImageUrlDTO;
 import kr.kro.moonlightmoist.shopapi.review.repository.ReviewRepository;
 import kr.kro.moonlightmoist.shopapi.user.domain.User;
-import kr.kro.moonlightmoist.shopapi.user.domain.UserGrade;
-import kr.kro.moonlightmoist.shopapi.user.domain.UserRole;
 import kr.kro.moonlightmoist.shopapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -127,6 +126,21 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void remove(Long reviewId) {
         reviewRepository.deleteById(reviewId);
+    }
+
+    @Override
+    public void addImageUrls(Long id, ReviewImageUrlDTO dto) {
+
+        Review review = reviewRepository.findById(id).get();
+
+        for(String imageUrl : dto.getImageUrls()) {
+            ReviewImage reviewImage = ReviewImage.builder()
+                    .imageUrl(imageUrl)
+                    .build();
+            review.getReviewImages().add(reviewImage);
+        }
+        log.info("리뷰 ID = {}, 이미지 개수= {}, 결과 = {}",
+                id, dto.getImageUrls().size(), review.getReviewImages());
     }
 
 }

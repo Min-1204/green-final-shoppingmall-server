@@ -39,9 +39,6 @@ public class Review extends BaseTimeEntity {
     @Builder.Default
     private boolean deleted = false;
 
-//    @Column(name="product_id")
-//    private Long productId;
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private User user;
@@ -55,12 +52,12 @@ public class Review extends BaseTimeEntity {
     @Builder.Default
     private List<ReviewImage> reviewImages = new ArrayList<>();
 
-    public void changeContent(String content) { this.content=content; }
-    public void changeRating(int rating) { this.rating=rating; }
-
     public void addImage(ReviewImage image) {
-        image.setOrder(this.reviewImages.size());
+        image.setImageOrder(this.reviewImages.size());
         reviewImages.add(image);
     }
+
+    public void changeContent(String content) { this.content=content; }
+    public void changeRating(int rating) { this.rating=rating; }
 
 }

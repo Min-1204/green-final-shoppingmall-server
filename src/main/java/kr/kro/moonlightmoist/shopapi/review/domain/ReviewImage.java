@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Getter
+@Setter
 @ToString
 public class ReviewImage {
 
@@ -18,7 +19,7 @@ public class ReviewImage {
     private int imageOrder;
     private String fileName;
 
-    public void setOrder(int imageOrder) {
+    public void setImageOrder(int imageOrder) {
         this.imageOrder = imageOrder;
     }
 
