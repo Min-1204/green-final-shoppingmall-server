@@ -95,20 +95,15 @@ public class ProductServiceImpl implements ProductService{
         );
 
         Page<Product> page = productRepository.findByCategoryIdIn(depth3CategoryIds, pageable);
-
-        List<ProductRes> result = page.get().map(product -> ProductRes.builder()
-                .id(product.getId())
-                .brand(product.getBrand().toDTO())
-                .category(product.getCategory().toDTO())
-                .basicInfo(product.getBasicInfo().toDTO())
-                .saleInfo(product.getSaleInfo().toDTO())
-                .deliveryPolicy(product.getDeliveryPolicy().toDTO())
-                .options(product.getProductOptions().stream().map(option -> option.toDTO()).toList())
-                .mainImages(product.getMainImages().stream().map(image -> image.toDTO()).toList())
-                .build()).toList();
-
+        List<ProductRes> result = page.get().map(product -> product.toDTO()).toList();
         return result;
     }
 
+    @Override
+    public ProductRes searchProductById(Long id) {
+        Product product = productRepository.findById(id).get();
+        ProductRes dto = product.toDTO();
+        return dto;
+    }
 
 }
