@@ -2,10 +2,7 @@ package kr.kro.moonlightmoist.shopapi.user.controller;
 
 
 import kr.kro.moonlightmoist.shopapi.user.domain.User;
-import kr.kro.moonlightmoist.shopapi.user.dto.LoginIdCheckResponse;
-import kr.kro.moonlightmoist.shopapi.user.dto.UserLoginRequest;
-import kr.kro.moonlightmoist.shopapi.user.dto.UserLoginResponse;
-import kr.kro.moonlightmoist.shopapi.user.dto.UserSignUpRequest;
+import kr.kro.moonlightmoist.shopapi.user.dto.*;
 import kr.kro.moonlightmoist.shopapi.user.repository.UserRepository;
 import kr.kro.moonlightmoist.shopapi.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor // Final 생성
@@ -57,6 +56,18 @@ public class UserController {
         // true / false만 반환하는 대신에 중복여부확인과 프론트에 전달할 메세지까지 객체형태로 담아서 전달
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserProfileResponse> getUserProfile (@RequestParam String loginId) {
+        UserProfileResponse profileResponse = userService.getUserProfile(loginId);
+        return ResponseEntity.ok(profileResponse);
+    }
+
+//    @PutMapping("/profile-modify")
+//    public ResponseEntity<UserModifyResponse> modifyUserProfile (@RequestBody UserModifyRequest userModifyRequest) {
+//
+//        return ResponseEntity.ok(userModifyResponse);
+//    }
 
 
 
