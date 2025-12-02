@@ -35,4 +35,8 @@ public class OrderProduct extends BaseTimeEntity {
     @Column(nullable = false)
     private OrderProductStatus orderProductStatus;
 
+    public void updateStatus(OrderProductStatus orderProductStatus) {
+        this.orderProductStatus=orderProductStatus;
+    }
+
 }

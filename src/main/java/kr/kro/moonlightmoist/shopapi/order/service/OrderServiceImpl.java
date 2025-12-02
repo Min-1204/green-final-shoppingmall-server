@@ -1,5 +1,6 @@
 package kr.kro.moonlightmoist.shopapi.order.service;
 
+import com.siot.IamportRestClient.response.Payment;
 import kr.kro.moonlightmoist.shopapi.order.domain.Order;
 import kr.kro.moonlightmoist.shopapi.order.domain.OrderProduct;
 import kr.kro.moonlightmoist.shopapi.order.domain.OrderProductStatus;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -152,7 +154,7 @@ public class OrderServiceImpl implements OrderService{
                     .productOption(productOption)
                     .quantity(item.getQuantity())
                     .purchasedPrice(productOption.getSellingPrice())
-                    .orderProductStatus(OrderProductStatus.PAID)
+                    .orderProductStatus(OrderProductStatus.PENDING_PAYMENT)
                     .build();
 
             // 주문 상품 리스트에 주문 상품 추가
@@ -181,6 +183,25 @@ public class OrderServiceImpl implements OrderService{
         }
 
         return ListOfOrderResponseDTO;
+    }
+
+    @Override
+    public BigDecimal getExpectedAmount(String merchantUid) {
+        return BigDecimal.valueOf(orderRepository.findByMerchantUid(merchantUid).get().getFinalAmount());
+    }
+
+    @Override
+    public void completeOrder(String merchantUid) {
+        // 1. 주문 조회
+        Order order = orderRepository.findByMerchantUid(merchantUid).get();
+
+        // 2. 주문 상품들의 상태를 PAID로 변경
+        for(OrderProduct orderProduct : order.getOrderProducts()) {
+            orderProduct.updateStatus(OrderProductStatus.PAID);
+        }
+
+        log.info("주문 결제 완료 처리. 주문번호: {}", merchantUid);
+
     }
 
 }

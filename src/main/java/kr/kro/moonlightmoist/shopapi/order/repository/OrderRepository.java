@@ -6,8 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order,Long> {
     @Query("select o from Order o where o.user.id=:userId")
     List<Order> findOrderByUserId(@Param("userId") Long userId);
+
+    @Query("select o from Order o where o.orderNumber=:merchantUid")
+    Optional<Order> findByMerchantUid(@Param("merchantUid") String merchantUid);
 }
