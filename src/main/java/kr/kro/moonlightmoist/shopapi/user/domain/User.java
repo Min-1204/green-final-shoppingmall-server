@@ -112,6 +112,10 @@ public class User extends BaseTimeEntity {
         this.smsAgreement = request.isSmsAgreement();
     }
 
+    public void changePassword(String newPassword) {
+        this.password = newPassword;
+    }
+
 
 
 }

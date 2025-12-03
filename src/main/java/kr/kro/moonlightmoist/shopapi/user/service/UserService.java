@@ -10,4 +10,5 @@ public interface UserService {
     boolean checkLoginId(String loginId);
     UserProfileResponse getUserProfile(String loginId);
     UserModifyResponse modifyUserProfile(UserModifyRequest userModifyRequest);
+    PasswordChangeResponse changeUserPassword(PasswordChangeRequest passwordChangeRequest);
 }

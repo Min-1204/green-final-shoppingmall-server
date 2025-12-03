@@ -110,5 +110,17 @@ public class UserServiceImpl implements UserService {
         // 반환값을 UserModifyResponse 객체를 생성하여 필드값에 할당
     }
 
+    @Override
+    public PasswordChangeResponse changeUserPassword(PasswordChangeRequest passwordChangeRequest) {
+        User user = userRepository.findByLoginId(passwordChangeRequest.getLoginId())
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        if (!user.getPassword().equals(passwordChangeRequest.getPassword())) {
+            return new PasswordChangeResponse(false, "비밀번호가 일치하지 않습니다.");
+        }
+        user.changePassword(passwordChangeRequest.getNewPassword());
+        userRepository.save(user);
+        return new PasswordChangeResponse(true, "비밀번호 변경 완료");
+    }
+
 
 }
