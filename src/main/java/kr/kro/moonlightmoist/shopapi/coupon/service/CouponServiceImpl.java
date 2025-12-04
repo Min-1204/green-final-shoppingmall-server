@@ -7,6 +7,7 @@ import kr.kro.moonlightmoist.shopapi.coupon.repository.CouponRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -29,5 +30,19 @@ public class CouponServiceImpl implements CouponService{
         List<Coupon> couponList = couponRepository.search(condition);
         List<CouponDto> dtos = couponList.stream().map(coupon -> coupon.toDto()).toList();
         return dtos;
+    }
+
+    @Override
+    public CouponDto findCoupon(Long id) {
+        CouponDto coupon = couponRepository.findById(id).get().toDto();
+        return coupon;
+    }
+
+    @Override
+    @Transactional
+    public Long modifyCoupon(CouponDto dto) {
+        Coupon coupon = couponRepository.findById(dto.getId()).get();
+        coupon.changeCoupon(dto);
+        return dto.getId();
     }
 }

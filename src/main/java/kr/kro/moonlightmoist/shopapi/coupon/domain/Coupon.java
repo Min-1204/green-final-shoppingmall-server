@@ -120,4 +120,27 @@ public class Coupon extends BaseTimeEntity {
                 .issueCount(this.issueCount)
                 .build();
     }
+
+    public void changeCoupon(CouponDto dto) {
+        this.name = dto.getName();
+        this.issueType = dto.getIssueType();
+        this.autoIssueType = dto.getAutoIssueType();
+        this.autoIssueTrigger = dto.getAutoIssueTrigger();
+        this.couponCode = dto.getCouponCode();
+        this.totalQuantity = dto.getTotalQuantity();
+        this.issuableStartDate = dto.getIssuableStartDate();
+        this.issuableEndDate = dto.getIssuableEndDate();
+        this.availability = dto.getAvailability();
+        this.limitUsagePeriod = dto.getLimitUsagePeriod();
+        this.validFrom = dto.getValidFrom();
+        this.validTo = dto.getValidTo();
+        this.limitMinOrderAmount = dto.getLimitMinOrderAmount();
+        this.minOrderAmount = dto.getMinOrderAmount();
+        this.discountType = dto.getDiscountType();
+        this.fixedDiscountAmount = dto.getFixedDiscountAmount();
+        this.discountPercentage = dto.getDiscountPercentage();
+        this.limitMaxDiscountAmount = dto.getLimitMaxDiscountAmount();
+        this.maxDiscountAmount = dto.getMaxDiscountAmount();
+        this.issueCount = dto.getIssueCount();
+    }
 }

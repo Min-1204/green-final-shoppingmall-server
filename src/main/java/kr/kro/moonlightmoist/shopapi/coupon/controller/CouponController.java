@@ -40,4 +40,20 @@ public class CouponController {
         List<CouponDto> coupons = couponService.searchCouponsByCondition(condition);
         return ResponseEntity.ok(coupons);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CouponDto> getCouponData(@PathVariable("id") Long id) {
+        System.out.println("id = " + id);
+        CouponDto coupon = couponService.findCoupon(id);
+        return ResponseEntity.ok(coupon);
+    }
+
+    @PostMapping("/modify")
+    public ResponseEntity<Long> modifyCoupon(@RequestBody CouponDto dto) {
+
+        Long id = couponService.modifyCoupon(dto);
+
+        return ResponseEntity.ok(id);
+    }
+
 }
