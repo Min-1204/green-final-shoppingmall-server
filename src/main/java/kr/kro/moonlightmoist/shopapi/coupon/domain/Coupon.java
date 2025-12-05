@@ -118,6 +118,7 @@ public class Coupon extends BaseTimeEntity {
                 .limitMaxDiscountAmount(this.limitMaxDiscountAmount)
                 .maxDiscountAmount(this.maxDiscountAmount)
                 .issueCount(this.issueCount)
+                .deleted(this.deleted)
                 .build();
     }
 
@@ -142,5 +143,6 @@ public class Coupon extends BaseTimeEntity {
         this.limitMaxDiscountAmount = dto.getLimitMaxDiscountAmount();
         this.maxDiscountAmount = dto.getMaxDiscountAmount();
         this.issueCount = dto.getIssueCount();
+        this.deleted = dto.getDeleted();
     }
 }
