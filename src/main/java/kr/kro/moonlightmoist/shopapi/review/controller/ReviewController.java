@@ -1,9 +1,10 @@
 package kr.kro.moonlightmoist.shopapi.review.controller;
 
 import kr.kro.moonlightmoist.shopapi.aws.service.S3UploadService;
+import kr.kro.moonlightmoist.shopapi.pagination.PageRequestDTO;
+import kr.kro.moonlightmoist.shopapi.pagination.PageResponseDTO;
 import kr.kro.moonlightmoist.shopapi.review.dto.ReviewDTO;
 import kr.kro.moonlightmoist.shopapi.review.dto.ReviewImageUrlDTO;
-import kr.kro.moonlightmoist.shopapi.review.repository.ReviewRepository;
 import kr.kro.moonlightmoist.shopapi.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,22 +22,39 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173")
 public class ReviewController {
 
-    private final ReviewRepository reviewRepository;
     private final ReviewService reviewService;
     private final S3UploadService s3UploadService;
 
     @GetMapping("/product/{productId}")
-    public ResponseEntity<List<ReviewDTO>> getList(
+    public ResponseEntity<PageResponseDTO<ReviewDTO>> getList(
             @PathVariable("productId") Long productId,
-            @RequestParam(defaultValue = "sort") String sort
-            ){
-        List<ReviewDTO> reviews = reviewService.getList(productId, sort);
+            @RequestParam(defaultValue = "latest") String sort, //기본 최신순
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+            ) {
+
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
+            .page(page)
+            .size(size)
+            .build();
+
+        PageResponseDTO<ReviewDTO> reviews = reviewService.getList(productId, sort, pageRequestDTO);
         return ResponseEntity.ok(reviews);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ReviewDTO>> getMyReviews(@PathVariable Long userId){
-        List<ReviewDTO> reviews = reviewService.getListByUser(userId);
+    public ResponseEntity<PageResponseDTO<ReviewDTO>> getMyReviews(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+          ) {
+
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
+            .page(page)
+            .size(size)
+            .build();
+
+        PageResponseDTO<ReviewDTO> reviews = reviewService.getListByUser(userId, pageRequestDTO);
         return ResponseEntity.ok(reviews);
     }
 
@@ -96,30 +114,28 @@ public class ReviewController {
 
     @GetMapping("/product/{productId}/avg")
     public ResponseEntity<Double> getAvgRating(@PathVariable Long productId){
-        double avgRating = reviewRepository.reviewAvgRating(productId);
+        double avgRating = reviewService.getAvgRating(productId);
         return ResponseEntity.ok(avgRating);
     }
 
     @GetMapping("/product/{productId}/count")
     public ResponseEntity<Integer> getReviewCount(@PathVariable Long productId){
-        log.info("ProductId for review count: {}", productId);
-        int reviewCount = reviewRepository.reviewCount(productId);
-        log.info("Review count from repo: {}", reviewCount);
+        int reviewCount = reviewService.getReviewTotalCount(productId);
         return ResponseEntity.ok(reviewCount);
     }
 
     @GetMapping("/product/{productId}/{rating}/count")
-    public ResponseEntity<Integer> getRatingBycount(
+    public ResponseEntity<Integer> getRatingByCount(
             @PathVariable Long productId,
             @PathVariable Integer rating
     ){
-        int ratingBycount = reviewRepository.ratingByCount(productId, rating);
+        int ratingBycount = reviewService.getRatingByCount(productId, rating);
         return ResponseEntity.ok(ratingBycount);
     }
 
     @GetMapping("/product/{productId}/positive")
     public ResponseEntity<Integer> getPositiveReview(@PathVariable Long productId){
-        int positiveReview = reviewRepository.positiveReview(productId);
+        int positiveReview = reviewService.getPositiveReview(productId);
         return ResponseEntity.ok(positiveReview);
     }
 

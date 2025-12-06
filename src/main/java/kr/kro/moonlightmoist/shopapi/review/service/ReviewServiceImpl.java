@@ -3,6 +3,8 @@ package kr.kro.moonlightmoist.shopapi.review.service;
 import jakarta.transaction.Transactional;
 import kr.kro.moonlightmoist.shopapi.order.domain.Order;
 import kr.kro.moonlightmoist.shopapi.order.repository.OrderRepository;
+import kr.kro.moonlightmoist.shopapi.pagination.PageRequestDTO;
+import kr.kro.moonlightmoist.shopapi.pagination.PageResponseDTO;
 import kr.kro.moonlightmoist.shopapi.product.domain.Product;
 import kr.kro.moonlightmoist.shopapi.product.domain.ProductMainImage;
 import kr.kro.moonlightmoist.shopapi.product.repository.ProductRepository;
@@ -15,6 +17,10 @@ import kr.kro.moonlightmoist.shopapi.user.domain.User;
 import kr.kro.moonlightmoist.shopapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -41,83 +47,112 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<ReviewDTO> getList(Long productId, String sort) {
-        List<Review> reviews = reviewRepository.findByProductId(productId);
+    public PageResponseDTO<ReviewDTO> getList(Long productId, String sort, PageRequestDTO pageRequestDTO) {
 
+        int page = pageRequestDTO.getPage() - 1;
+        int size = pageRequestDTO.getSize();
+
+        //Sort 객체 생성
+        Sort sortBy = Sort.by("createdAt").descending(); // 기본 정렬: 최신순
+
+        //요청된 sort 값에 따라 Sort 객체 업데이트
         if (sort.equals("latest")) {
-            reviews.sort((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()));
-        } else if (sort.equals("oldest")) {
-            reviews.sort((r1, r2) -> r1.getCreatedAt().compareTo(r2.getCreatedAt()));
-        } else if (sort.equals("ratingDesc")) {
-            reviews.sort((r1, r2) -> {
-                int ratingDesc = r2.getRating() - r1.getRating();
-                if (ratingDesc != 0) return ratingDesc;
-                return r2.getCreatedAt().compareTo(r1.getCreatedAt());
-            }); //내림차순
-        } else if (sort.equals("ratingAsc")) {
-            reviews.sort((r1, r2) -> {
-                int ratingAsc = r1.getRating() - r2.getRating();
-                if (ratingAsc != 0) return ratingAsc;
-                return r1.getCreatedAt().compareTo(r2.getCreatedAt());
-            }); //오름차순
+            sortBy = Sort.by("createdAt").descending();
+        } else if (sort.equals("ratingDesc")) { // 별점높은순 정렬
+            // 동일 별점 시 최신순으로 정렬
+            sortBy = Sort.by("rating").descending().and(Sort.by("createdAt").descending());
+        } else if (sort.equals("ratingAsc")) { // 별점낮은순 정렬
+            // 동일 별점 시 최신순으로 정렬
+            sortBy = Sort.by("rating").ascending().and(Sort.by("createdAt").descending());
         }
 
-        List<ReviewDTO> reviewDTO = reviews.stream().map(review -> {
+        //Pageable 객체 생성 (page, size, sort 적용)
+        Pageable pageable = PageRequest.of(page, size, sortBy);
+
+        //리뷰 조회 실행 (좋아요순은 별도 처리)
+        Page<Review> reviewPage;
+
+        if (sort.equals("like")) {
+            reviewPage = reviewRepository.findByProductIdLike(productId, PageRequest.of(page, size));
+        } else {
+            //나머지 정렬 (latest, ratingDesc, ratingAsc)
+            reviewPage = reviewRepository.findByProductId(productId, pageable);
+        }
+
+        //Page<Review> 데이터를 List<ReviewDTO>로 매핑
+        List<ReviewDTO> reviewDTOList = reviewPage.getContent().stream().map(review -> {
             List<String> imageUrls = review.getReviewImages().stream()
-                    .map(img -> img.getImageUrl()).toList();
-            System.out.println("이미지 URL 리스트: " + imageUrls);
+                .map(img -> img.getImageUrl()).toList();
 
             return ReviewDTO.builder()
-                    .id(review.getId())
-                    .productId(review.getProduct().getId())
-                    .userId(review.getUser().getId())
-                    .loginId(review.getUser().getLoginId())
-                    .content(review.getContent())
-                    .rating(review.getRating())
-                    .imageUrls(imageUrls)
-                    .createdAt(review.getCreatedAt())
-                    .build();
+                .id(review.getId())
+                .productId(review.getProduct().getId())
+                .userId(review.getUser().getId())
+                .loginId(review.getUser().getLoginId())
+                .content(review.getContent())
+                .rating(review.getRating())
+                .createdAt(review.getCreatedAt())
+                .imageUrls(imageUrls)
+                .build();
         }).toList();
 
-        return reviewDTO;
+        //PageResponseDTO 반환
+        return PageResponseDTO.<ReviewDTO>withAll()
+            .dtoList(reviewDTOList)
+            .pageRequestDTO(pageRequestDTO)
+            .totalDataCount(reviewPage.getTotalElements()) // 전체 데이터 수
+            .build();
     }
 
     @Override
-    public List<ReviewDTO> getListByUser(Long userId) {
-        List<Review> reviewList = reviewRepository.findByUserId(userId);
+    public PageResponseDTO<ReviewDTO> getListByUser(Long userId, PageRequestDTO pageRequestDTO) {
 
-        return reviewList.stream().map(review -> {
-            //리뷰 이미지 URL
-            List<String> imageUrls = review.getReviewImages().stream()
-                    .map(url -> url.getImageUrl()).toList();
+        int page = pageRequestDTO.getPage() - 1;
+        int size = pageRequestDTO.getSize();
 
-            //제품 메인 이미지
-            List<ProductMainImage> productMainImgs = review.getProduct().getMainImages();
-            String productImage = productMainImgs.get(0).getImageUrl();
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
-            //제품명
-            String productName = review.getProduct().getBasicInfo().getProductName();
+        Page<Review> reviewPage = reviewRepository.findByUserId(userId, pageable);
 
-            //브랜드명
-            String brandName = review.getProduct().getBrand().getName();
+        List<ReviewDTO> reviewDTOList = reviewPage.getContent().stream()
+            .map(review -> {
+              //리뷰 이미지 URL
+              List<String> imageUrls = review.getReviewImages().stream()
+                  .map(url -> url.getImageUrl()).toList();
 
-            //주문일자
-            LocalDateTime purchaseDate = review.getOrder().getCreatedAt();
+              //제품 메인 이미지
+              List<ProductMainImage> productMainImgs = review.getProduct().getMainImages();
+              String productImage = productMainImgs.get(0).getImageUrl();
 
-            return ReviewDTO.builder()
-                    .id(review.getId())
-                    .content(review.getContent())
-                    .rating(review.getRating())
-                    .userId(review.getUser().getId())
-                    .productId(review.getProduct().getId())
-                    .productImage(productImage)
-                    .productName(productName)
-                    .brandName(brandName)
-                    .createdAt(review.getCreatedAt())
-                    .purchaseDate(purchaseDate)
-                    .imageUrls(imageUrls)
-                    .build();
-        }).toList();
+              //제품명
+              String productName = review.getProduct().getBasicInfo().getProductName();
+
+              //브랜드명
+              String brandName = review.getProduct().getBrand().getName();
+
+              //주문일자
+              LocalDateTime purchaseDate = review.getOrder().getCreatedAt();
+
+              return ReviewDTO.builder()
+                  .id(review.getId())
+                  .content(review.getContent())
+                  .rating(review.getRating())
+                  .userId(review.getUser().getId())
+                  .productId(review.getProduct().getId())
+                  .productImage(productImage)
+                  .productName(productName)
+                  .brandName(brandName)
+                  .createdAt(review.getCreatedAt())
+                  .purchaseDate(purchaseDate)
+                  .imageUrls(imageUrls)
+                  .build();
+            }).toList();
+
+        return PageResponseDTO.<ReviewDTO>withAll()
+                .dtoList(reviewDTOList)
+                .pageRequestDTO(pageRequestDTO)
+                .totalDataCount(reviewPage.getTotalElements())
+                .build();
     }
 
     @Override
@@ -143,8 +178,13 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ReviewDTO modify(ReviewDTO reviewDTO) {
-        Optional<Review> foundReview = reviewRepository.findById(reviewDTO.getId());
-        Review review = foundReview.orElseThrow();
+        Optional<Review> foundReviewId = reviewRepository.findById(reviewDTO.getId());
+        Review review = foundReviewId.orElseThrow();
+        
+        //본인 리뷰만 수정 가능
+        if (!review.getUser().getId().equals(reviewDTO.getUserId())) {
+            throw new RuntimeException("본인의 리뷰만 수정할 수 있습니다.");
+        }
 
         review.changeContent(reviewDTO.getContent());
         review.changeRating(reviewDTO.getRating());
@@ -165,7 +205,15 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void remove(Long reviewId) {
+    public void remove(Long reviewId, Long userId) {
+        Optional<Review> foundReviewId = reviewRepository.findById(userId);
+        Review review = foundReviewId.orElseThrow();
+
+        //본인 리뷰만 삭제 가능
+        if (!review.getUser().getId().equals(userId)) {
+            throw new RuntimeException("본인의 리뷰만 삭제할 수 있습니다.");
+        }
+
         reviewRepository.deleteById(reviewId);
     }
 
@@ -182,6 +230,26 @@ public class ReviewServiceImpl implements ReviewService {
         }
         log.info("리뷰 ID = {}, 이미지 개수= {}, 결과 = {}",
                 id, dto.getImageUrls().size(), review.getReviewImages());
+    }
+
+    @Override
+    public Double getAvgRating(Long productId) {
+        return reviewRepository.reviewAvgRating(productId);
+    }
+
+    @Override
+    public int getReviewTotalCount(Long productId) {
+        return reviewRepository.reviewTotalCount(productId);
+    }
+
+    @Override
+    public int getRatingByCount(Long productId, Integer rating) {
+        return reviewRepository.ratingByCount(productId, rating);
+    }
+
+    @Override
+    public int getPositiveReview(Long productId) {
+        return reviewRepository.positiveReview(productId);
     }
 
 }

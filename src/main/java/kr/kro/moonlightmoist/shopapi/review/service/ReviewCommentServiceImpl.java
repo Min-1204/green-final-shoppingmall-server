@@ -22,11 +22,11 @@ import java.util.Optional;
 @Transactional
 public class ReviewCommentServiceImpl implements ReviewCommentService {
 
-  private final ReviewRepository reviewRepository;
-  private final ReviewCommentRepository reviewCommentRepository;
-  private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
+    private final ReviewCommentRepository reviewCommentRepository;
+    private final UserRepository userRepository;
 
-  public Review getReview(Long reviewId) {
+    public Review getReview(Long reviewId) {
     return reviewRepository.findById(reviewId).get();
   }
 
@@ -34,55 +34,66 @@ public class ReviewCommentServiceImpl implements ReviewCommentService {
         return userRepository.findById(userId).get();
     }
 
-  @Override
-  public List<ReviewCommentDTO> getList(Long reviewId) {
-    List<ReviewComment> reviewComments = reviewCommentRepository.findByReviewId(reviewId);
+    @Override
+    public List<ReviewCommentDTO> getList(Long reviewId) {
+        List<ReviewComment> reviewComments = reviewCommentRepository.findByReviewId(reviewId);
 
-    List<ReviewCommentDTO> reviewCommentDTO = reviewComments.stream().map(reviewComment -> {
-      return ReviewCommentDTO.builder()
-          .id(reviewComment.getId())
-          .reviewId(reviewComment.getReview().getId())
-          .userId(reviewComment.getUser().getId())
-          .loginId(reviewComment.getUser().getLoginId())
-          .content(reviewComment.getContent())
-          .createAt(reviewComment.getCreatedAt())
-          .build();
-    }).toList();
-    return reviewCommentDTO;
+        List<ReviewCommentDTO> reviewCommentDTO = reviewComments.stream().map(reviewComment -> {
+            return ReviewCommentDTO.builder()
+                    .id(reviewComment.getId())
+                    .reviewId(reviewComment.getReview().getId())
+                    .userId(reviewComment.getUser().getId())
+                    .loginId(reviewComment.getUser().getLoginId())
+                    .content(reviewComment.getContent())
+                    .createAt(reviewComment.getCreatedAt())
+                    .build();
+        }).toList();
+        return reviewCommentDTO;
   }
 
-  @Override
-  public Long register(@RequestBody ReviewCommentDTO dto) {
+    @Override
+    public Long register(@RequestBody ReviewCommentDTO dto) {
+        Review review = getReview(dto.getReviewId());
+        User user = getUser(dto.getUserId());
 
-    Review review = getReview(dto.getReviewId());
-    User user = getUser(dto.getUserId());
+        ReviewComment reviewComment = ReviewComment.builder()
+                .content(dto.getContent())
+                .review(review)
+                .user(user)
+                .build();
 
-    ReviewComment reviewComment = ReviewComment.builder()
-        .content(dto.getContent())
-        .review(review)
-        .user(user)
-        .build();
+        ReviewComment saveReviewComment = reviewCommentRepository.save(reviewComment);
 
-    ReviewComment saveReviewComment = reviewCommentRepository.save(reviewComment);
-
-    return saveReviewComment.getId();
+        return saveReviewComment.getId();
   }
 
-  @Override
-  public ReviewCommentDTO modify(ReviewCommentDTO dto) {
-    Optional<ReviewComment> foundReviewComment = reviewCommentRepository.findById(dto.getId());
-    ReviewComment reviewComment = foundReviewComment.get();
+    @Override
+    public ReviewCommentDTO modify(ReviewCommentDTO dto) {
+        Optional<ReviewComment> reviewCommentId = reviewCommentRepository.findById(dto.getId());
+        ReviewComment reviewComment = reviewCommentId.get();
 
-    reviewComment.changeContent(dto.getContent());
+        //본인 댓글만 수정
+        if (!reviewComment.getUser().getId().equals(dto.getUserId())) {
+            throw new RuntimeException("본인의 댓글만 수정할 수 있습니다.");
+        }
 
-    return ReviewCommentDTO.builder()
-        .content(dto.getContent())
-        .build();
+        reviewComment.changeContent(dto.getContent());
+
+        return ReviewCommentDTO.builder()
+                .content(dto.getContent())
+                .build();
   }
 
-  @Override
-  public void remove(Long id) {
-      reviewCommentRepository.deleteById(id);
+    @Override
+    public void remove(Long id, Long userId) {
+        Optional<ReviewComment> reviewCommentId = reviewCommentRepository.findById(id);
+        ReviewComment reviewComment = reviewCommentId.get();
 
-  }
+        //본인 댓글만 삭제
+        if (!reviewComment.getUser().getId().equals(userId)) {
+            throw new RuntimeException("본인의 댓글만 삭제할 수 있습니다.");
+        }
+
+        reviewCommentRepository.deleteById(id);
+    }
 }
