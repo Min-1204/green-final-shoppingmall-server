@@ -1,7 +1,6 @@
 package kr.kro.moonlightmoist.shopapi.helpcenter.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import kr.kro.moonlightmoist.shopapi.helpcenter.domain.InquiryStatus;
 import kr.kro.moonlightmoist.shopapi.helpcenter.domain.InquiryType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -2,8 +2,12 @@ package kr.kro.moonlightmoist.shopapi.helpcenter.domain;
 
 import jakarta.persistence.*;
 import kr.kro.moonlightmoist.shopapi.common.domain.BaseTimeEntity;
+import kr.kro.moonlightmoist.shopapi.helpcenter.dto.InquiryModifyRequest;
 import kr.kro.moonlightmoist.shopapi.user.domain.User;
+import kr.kro.moonlightmoist.shopapi.user.dto.UserModifyRequest;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "inquiries")
@@ -40,15 +44,23 @@ public class Inquiry extends BaseTimeEntity {
     @Column(name = "is_visible")
     private boolean visible = true;   // 노출 여부
 
-    @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private InquiryStatus inquiryStatus = InquiryStatus.PENDING; // 진행 상태
-
     private boolean emailAgreement; // 이메일알림동의
-
     private boolean smsAgreement; // sms 알림동의
+
+    @Column(name = "answer_created_at")
+    private LocalDateTime answerCreatedAt;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public void updateInquiry(InquiryModifyRequest request) {
+        this.title = request.getTitle();
+        this.content =request.getContent();
+        this.inquiryType = request.getInquiryType();
+        this.emailAgreement = request.isEmailAgreement();
+        this.smsAgreement = request.isSmsAgreement();
+    }
+
+
 }
