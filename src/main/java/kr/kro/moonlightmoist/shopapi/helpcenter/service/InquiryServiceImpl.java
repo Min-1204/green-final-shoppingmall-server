@@ -23,9 +23,14 @@ public class InquiryServiceImpl implements InquiryService{
 
     @Override
     public InquiryCreateResponse registerInquiry(InquiryCreateRequest createRequest) {
-
+        // 등록 서비스
         User user = userRepository.findByLoginId(createRequest.getLoginId())
                 .orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+//        SELECT * FROM users WHERE login_id = 'user1';
+//        조회된 모든 컬럼을 User 엔티티 객체로 매핑
+//      1)  loginId는 단순히 검색 조건
+//      2)  DB는 해당 조건에 맞는 row 전체를 반환
+//      3)  JPA가 그 row의 모든 컬럼을 User 객체의 필드에 자동 매핑
 
         Inquiry createInquiry = Inquiry.builder()
                 .user(user)
@@ -50,6 +55,7 @@ public class InquiryServiceImpl implements InquiryService{
     public InquiryListDTO getInquiryList(String loginId) {
         User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+//        SELECT * FROM inquiry WHERE user_id = ?
 
         List<Inquiry> inquiries = inquiryRepository.findByUser(user);
 

@@ -46,12 +46,12 @@ public class InquiryController {
 
 
     @DeleteMapping("/inquiry-delete/{id}")
-    public ResponseEntity<?> deleteInquiry(@PathVariable Long id,
+    public ResponseEntity<String> deleteInquiry(@PathVariable Long id,
                                            @RequestParam String loginId) {
 
         service.deleteInquiry(id, loginId);
 
-        return ResponseEntity.ok().body("success");
+        return ResponseEntity.ok("문의글이 삭제되었습니다.");
     }
 
 }
