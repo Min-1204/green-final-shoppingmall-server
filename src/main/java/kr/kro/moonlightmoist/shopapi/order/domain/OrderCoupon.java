@@ -2,6 +2,9 @@ package kr.kro.moonlightmoist.shopapi.order.domain;
 
 import jakarta.persistence.*;
 import kr.kro.moonlightmoist.shopapi.common.domain.BaseTimeEntity;
+import kr.kro.moonlightmoist.shopapi.coupon.domain.DiscountType;
+import kr.kro.moonlightmoist.shopapi.order.dto.OrderCouponResponseDTO;
+import kr.kro.moonlightmoist.shopapi.order.dto.OrderResponseDTO;
 import kr.kro.moonlightmoist.shopapi.usercoupon.domain.UserCoupon;
 import lombok.*;
 
@@ -25,9 +28,29 @@ public class OrderCoupon extends BaseTimeEntity {
     @OneToOne
     @JoinColumn(name = "user_coupon_id",nullable = false)
     private UserCoupon userCoupon;
-//    @Column(nullable = false)
-//    private String couponCode;
     @Column(nullable = false)
     private int discountAmount;
+
+    // 쿠폰 코드 스냅샷 (null 허용)
+    @Column(nullable = true)
+    private String couponCode;
+
+    // 할인 타입 스냅샷
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DiscountType discountType;
+
+
+    public OrderCouponResponseDTO toDto() {
+        OrderCouponResponseDTO orderCouponResponseDTO = OrderCouponResponseDTO.builder()
+                .id(this.getId())
+                .discountAmount(this.getDiscountAmount())
+                .discountType(this.getDiscountType().name())
+                .couponCode(this.getCouponCode())
+                .appliedAt(this.getCreatedAt())
+                .userCouponName(this.getUserCoupon().getCoupon().getName())
+                .build();
+        return orderCouponResponseDTO;
+    }
 
 }

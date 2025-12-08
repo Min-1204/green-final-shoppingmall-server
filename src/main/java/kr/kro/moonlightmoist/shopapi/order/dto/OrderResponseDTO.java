@@ -1,5 +1,6 @@
 package kr.kro.moonlightmoist.shopapi.order.dto;
 
+import kr.kro.moonlightmoist.shopapi.order.domain.OrderCoupon;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -30,6 +31,9 @@ public class OrderResponseDTO {
     private String deliveryRequest;
     @Builder.Default
     private List<OrderProductResponseDTO> orderProducts = new ArrayList<>();
+
+    //주문에 사용된 쿠폰 조회
+    private OrderCouponResponseDTO orderCoupon;
 
     private LocalDate orderDate;
 

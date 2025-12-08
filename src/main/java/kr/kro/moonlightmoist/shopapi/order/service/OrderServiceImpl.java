@@ -4,12 +4,11 @@ import com.siot.IamportRestClient.response.Payment;
 import kr.kro.moonlightmoist.shopapi.coupon.domain.Coupon;
 import kr.kro.moonlightmoist.shopapi.coupon.domain.DiscountType;
 import kr.kro.moonlightmoist.shopapi.order.domain.Order;
+import kr.kro.moonlightmoist.shopapi.order.domain.OrderCoupon;
 import kr.kro.moonlightmoist.shopapi.order.domain.OrderProduct;
 import kr.kro.moonlightmoist.shopapi.order.domain.OrderProductStatus;
-import kr.kro.moonlightmoist.shopapi.order.dto.OrderProductRequestDTO;
-import kr.kro.moonlightmoist.shopapi.order.dto.OrderProductResponseDTO;
-import kr.kro.moonlightmoist.shopapi.order.dto.OrderRequestDTO;
-import kr.kro.moonlightmoist.shopapi.order.dto.OrderResponseDTO;
+import kr.kro.moonlightmoist.shopapi.order.dto.*;
+import kr.kro.moonlightmoist.shopapi.order.repository.OrderCouponRepository;
 import kr.kro.moonlightmoist.shopapi.order.repository.OrderRepository;
 import kr.kro.moonlightmoist.shopapi.product.domain.ImageType;
 import kr.kro.moonlightmoist.shopapi.product.domain.ProductMainImage;
@@ -24,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -35,12 +35,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 @Slf4j
+@Transactional
 public class OrderServiceImpl implements OrderService{
 
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ProductOptionRepository productOptionRepository;
     private final UserCouponRepository userCouponRepository;
+    private final OrderCouponRepository orderCouponRepository;
+
+    private final OrderCouponService orderCouponService;
 
     public String createOrderNumber() {
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -62,32 +66,6 @@ public class OrderServiceImpl implements OrderService{
         return totalProductAmount;
     }
 
-    public int calcCouponDiscountAmount(int totalProductAmount, Long userCouponId) {
-        UserCoupon userCoupon = userCouponRepository.findById(userCouponId).get();
-        Coupon coupon = userCoupon.getCoupon();
-        if(!coupon.getLimitMinOrderAmount() || (coupon.getLimitMinOrderAmount() && (totalProductAmount >= coupon.getMinOrderAmount()))){
-            if(coupon.getDiscountType() == DiscountType.FIXED) {
-                userCoupon.useCoupon();
-                userCouponRepository.save(userCoupon);
-                return coupon.getFixedDiscountAmount();
-            }
-            else {// 할인 타입이 PERCENTAGE일 경우
-                int discountAmount = totalProductAmount * coupon.getDiscountPercentage() / 100;
-                if(discountAmount > coupon.getMaxDiscountAmount()) {
-                    userCoupon.useCoupon();
-                    userCouponRepository.save(userCoupon);
-                    return coupon.getMaxDiscountAmount();
-                }
-                userCoupon.useCoupon();
-                userCouponRepository.save(userCoupon);
-                return discountAmount;
-            }
-        }
-        else { // 최소 주문 금액이 안 될 경우
-            return 0;
-        }
-    }
-
     public int calcDeliveryFee(int totalProductAmount, List<OrderProductRequestDTO> orderProducts) {
         ProductOption productOption = productOptionRepository.findById(orderProducts.get(0).getProductOptionId()).get();
         int basicDeliveryFee = productOption.getProduct().getDeliveryPolicy().getBasicDeliveryFee();
@@ -97,6 +75,12 @@ public class OrderServiceImpl implements OrderService{
     }
 
     public OrderResponseDTO toDto(Order order) {
+        OrderCoupon orderCoupon = order.getOrderCoupon();
+        OrderCouponResponseDTO orderCouponResponseDTO = null;
+        if(orderCoupon != null) {
+            orderCouponResponseDTO = orderCoupon.toDto();
+        }
+
         OrderResponseDTO orderResponseDTO = OrderResponseDTO.builder()
                 .id(order.getId())
                 .orderNumber(order.getOrderNumber())
@@ -114,7 +98,10 @@ public class OrderServiceImpl implements OrderService{
                 .totalProductAmount(order.getTotalProductAmount())
                 .postalCode(order.getPostalCode())
                 .orderDate(order.getCreatedAt().toLocalDate())
+                .orderCoupon(orderCouponResponseDTO)
                 .build();
+
+
         for(OrderProduct op : order.getOrderProducts()){
             OrderProductResponseDTO orderProductResponseDTO = OrderProductResponseDTO.builder()
                     .id(op.getId())
@@ -146,11 +133,11 @@ public class OrderServiceImpl implements OrderService{
         // 4) 배송비 계산
         int deliveryFee = calcDeliveryFee(totalProductAmount, dto.getOrderProducts());
         // 5) 쿠폰 할인 가격 계산
-        int discountAmount = calcCouponDiscountAmount(totalProductAmount, dto.getUserCouponId());
-        // 6) 최종 결제 금액 계산
-        int finalAmount = totalProductAmount- discountAmount - dto.getUsedPoints();
-
-
+        int discountAmount = orderCouponService.calcAndUseCoupon(totalProductAmount, dto.getUserCouponId());
+        // 6) 포인트 계산
+        int usedPoints = dto.getUsedPoints();
+        // 7) 최종 결제 금액 계산
+        int finalAmount = totalProductAmount + deliveryFee - discountAmount - usedPoints;
 
         // 주문 생성
         Order order = Order.builder()
@@ -188,10 +175,21 @@ public class OrderServiceImpl implements OrderService{
         }
 
         orderRepository.save(order);
+
+        if(dto.getUserCouponId() != null && discountAmount > 0) {
+            Long orderCouponId = orderCouponService.saveCoupon(order.getId(), dto.getUserCouponId(), discountAmount);
+            OrderCoupon orderCoupon = orderCouponRepository.findById(orderCouponId).get();
+
+            // 주문 엔티티에 주문에 사용된 쿠폰 저장
+            order.applyOrderCoupon(orderCoupon);
+
+        }
+
         return order.getId();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrderResponseDTO getOneOrder(Long orderId) {
         Order order = orderRepository.findById(orderId).get();
         OrderResponseDTO orderResponseDTO = toDto(order);
@@ -234,8 +232,13 @@ public class OrderServiceImpl implements OrderService{
     public void deleteOneOrder(Long orderId) {
         log.info("deleteOneOrder 메서드 실행 orderId:{}",orderId);
         Order order = orderRepository.findById(orderId).get();
-        order.getOrderCoupon().getUserCoupon().recoverCoupon();
+        OrderCoupon orderCoupon = order.getOrderCoupon();
+        if(orderCoupon != null ){
+            orderCoupon.getUserCoupon().recoverCoupon();
+            orderCouponService.deleteOrderCoupon(orderCoupon.getId());
+        }
         orderRepository.deleteById(orderId);
+
     }
 
 }

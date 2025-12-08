@@ -77,4 +77,9 @@ public class Order extends BaseTimeEntity {
     @Builder.Default
     private List<OrderProduct> orderProducts = new ArrayList<>();
 
+    public void applyOrderCoupon(OrderCoupon orderCoupon) {
+        this.orderCoupon=orderCoupon;
+    }
+
+
 }
