@@ -58,7 +58,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    // Todo : REST API 원칙으로 @PathVariable 사용해서 변경하기.
+
     // @RequestParam 방식은 쿼리파라미터를 보내는 방식으로 REST API 원칙과는 다른방식
     @GetMapping("/profile/{loginId}")
     public ResponseEntity<UserProfileResponse> getUserProfile (@PathVariable String loginId) {

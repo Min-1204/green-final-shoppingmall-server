@@ -16,8 +16,15 @@ public class SecurityConfig {
                 // 공격 방지 설정 disable() 끄는 메서드
                 .csrf(csrf -> csrf.disable())
                 // 어떤 요청을 허용하고, 막을지를 설정하는 메서드
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
-//                                                                        anyRequest() 모든요청을 의미, premitAll() 모든요청 허용
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/user/login").permitAll()
+                        .requestMatchers("/api/user/signup").permitAll()
+                        .requestMatchers("/api/user/check-loginId").permitAll()
+
+                        .requestMatchers("/api/user/**").hasRole("USER")
+                        .anyRequest().authenticated());
+
+//            anyRequest() 모든요청을 의미, premitAll() 모든요청 허용
         return http.build(); // 해당 http를 만들어서 반환
     }
 }
