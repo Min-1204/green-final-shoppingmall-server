@@ -1,4 +1,4 @@
-package kr.kro.moonlightmoist.shopapi.pagination;
+package kr.kro.moonlightmoist.shopapi.review.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class PageRequestDTO {
+public class ReviewPageRequestDTO {
     @Builder.Default
     private int page = 1;
 

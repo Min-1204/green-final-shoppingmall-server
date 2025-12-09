@@ -3,8 +3,8 @@ package kr.kro.moonlightmoist.shopapi.review.service;
 import jakarta.transaction.Transactional;
 import kr.kro.moonlightmoist.shopapi.order.domain.Order;
 import kr.kro.moonlightmoist.shopapi.order.repository.OrderRepository;
-import kr.kro.moonlightmoist.shopapi.pagination.PageRequestDTO;
-import kr.kro.moonlightmoist.shopapi.pagination.PageResponseDTO;
+import kr.kro.moonlightmoist.shopapi.review.dto.ReviewPageRequestDTO;
+import kr.kro.moonlightmoist.shopapi.review.dto.ReviewPageResponseDTO;
 import kr.kro.moonlightmoist.shopapi.product.domain.Product;
 import kr.kro.moonlightmoist.shopapi.product.domain.ProductMainImage;
 import kr.kro.moonlightmoist.shopapi.product.repository.ProductRepository;
@@ -47,10 +47,10 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public PageResponseDTO<ReviewDTO> getList(Long productId, String sort, PageRequestDTO pageRequestDTO) {
+    public ReviewPageResponseDTO<ReviewDTO> getList(Long productId, String sort, ReviewPageRequestDTO reviewPageRequestDTO) {
 
-        int page = pageRequestDTO.getPage() - 1;
-        int size = pageRequestDTO.getSize();
+        int page = reviewPageRequestDTO.getPage() - 1;
+        int size = reviewPageRequestDTO.getSize();
 
         //Sort 객체 생성
         Sort sortBy = Sort.by("createdAt").descending(); // 기본 정렬: 최신순
@@ -97,18 +97,18 @@ public class ReviewServiceImpl implements ReviewService {
         }).toList();
 
         //PageResponseDTO 반환
-        return PageResponseDTO.<ReviewDTO>withAll()
+        return ReviewPageResponseDTO.<ReviewDTO>withAll()
             .dtoList(reviewDTOList)
-            .pageRequestDTO(pageRequestDTO)
+            .reviewPageRequestDTO(reviewPageRequestDTO)
             .totalDataCount(reviewPage.getTotalElements()) // 전체 데이터 수
             .build();
     }
 
     @Override
-    public PageResponseDTO<ReviewDTO> getListByUser(Long userId, PageRequestDTO pageRequestDTO) {
+    public ReviewPageResponseDTO<ReviewDTO> getListByUser(Long userId, ReviewPageRequestDTO reviewPageRequestDTO) {
 
-        int page = pageRequestDTO.getPage() - 1;
-        int size = pageRequestDTO.getSize();
+        int page = reviewPageRequestDTO.getPage() - 1;
+        int size = reviewPageRequestDTO.getSize();
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
@@ -148,9 +148,9 @@ public class ReviewServiceImpl implements ReviewService {
                   .build();
             }).toList();
 
-        return PageResponseDTO.<ReviewDTO>withAll()
+        return ReviewPageResponseDTO.<ReviewDTO>withAll()
                 .dtoList(reviewDTOList)
-                .pageRequestDTO(pageRequestDTO)
+                .reviewPageRequestDTO(reviewPageRequestDTO)
                 .totalDataCount(reviewPage.getTotalElements())
                 .build();
     }
