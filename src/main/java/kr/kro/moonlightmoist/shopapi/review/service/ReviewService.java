@@ -1,16 +1,16 @@
 package kr.kro.moonlightmoist.shopapi.review.service;
 
-import kr.kro.moonlightmoist.shopapi.review.dto.ReviewPageRequestDTO; // ⭐️ 추가
-import kr.kro.moonlightmoist.shopapi.review.dto.ReviewPageResponseDTO;
+import kr.kro.moonlightmoist.shopapi.review.dto.PageRequestDTO; // ⭐️ 추가
+import kr.kro.moonlightmoist.shopapi.review.dto.PageResponseDTO;
 import kr.kro.moonlightmoist.shopapi.review.dto.ReviewDTO;
 import kr.kro.moonlightmoist.shopapi.review.dto.ReviewImageUrlDTO;
 
 
 public interface ReviewService {
     //상품의 리뷰 전체 조회
-    ReviewPageResponseDTO<ReviewDTO> getList(Long productId, String sort, ReviewPageRequestDTO reviewPageRequestDTO);
+    PageResponseDTO<ReviewDTO> getList(Long productId, String sort, PageRequestDTO pageRequestDTO);
     //나의 리뷰 전체 조회(로그인한 유저 본인 리뷰)
-    ReviewPageResponseDTO<ReviewDTO> getListByUser(Long userId, ReviewPageRequestDTO reviewPageRequestDTO);
+    PageResponseDTO<ReviewDTO> getListByUser(Long userId, PageRequestDTO pageRequestDTO);
     //리뷰 등록
     Long register(ReviewDTO dto);
     //리뷰 수정

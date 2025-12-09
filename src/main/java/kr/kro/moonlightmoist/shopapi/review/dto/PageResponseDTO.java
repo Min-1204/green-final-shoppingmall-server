@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Getter
-public class ReviewPageResponseDTO<E> {
+public class PageResponseDTO<E> {
     private List<E> dtoList; //페이지에 보여줄 데이터들
     private List<Integer> pageNumList; //페이지 번호를 표시하기위한 목록
-    private ReviewPageRequestDTO reviewPageRequestDTO; //요청된 페이지, 페이지에 표시될 데이터 개수
+    private PageRequestDTO pageRequestDTO; //요청된 페이지, 페이지에 표시될 데이터 개수
 
     private boolean prevPageGroup, nextPageGroup; //이전 페이지와 다음 페이지 존재 여부
     private int totalDataCount, prevPage, nextPage, currentTotalPageCnt, currentPage;
@@ -21,18 +21,18 @@ public class ReviewPageResponseDTO<E> {
     //currentPage = 현재 페이지
 
     @Builder(builderMethodName = "withAll")
-    public ReviewPageResponseDTO(List<E> dtoList, ReviewPageRequestDTO reviewPageRequestDTO, long totalDataCount) {
+    public PageResponseDTO(List<E> dtoList, PageRequestDTO pageRequestDTO, long totalDataCount) {
         this.dtoList = dtoList;
-        this.reviewPageRequestDTO = reviewPageRequestDTO;
+        this.pageRequestDTO = pageRequestDTO;
         this.totalDataCount = (int) totalDataCount;
 
-        this.currentPage = reviewPageRequestDTO.getPage(); //현재 페이지
-        int endPage = (int) (Math.ceil(reviewPageRequestDTO.getPage() / 10.0) * 10);
+        this.currentPage = pageRequestDTO.getPage(); //현재 페이지
+        int endPage = (int) (Math.ceil(pageRequestDTO.getPage() / 10.0) * 10);
         //현재 볼 수 있는 마지막 페이지 / 1~10, 11~20, 21~30, 31~40 ...
         //현재 페이지가 3이면 10페이지까지, 현재 페이지가 15면 20페이지까지 보여줌
         int startPage = endPage - 9;
 
-        int lastPage = (int) (Math.ceil(totalDataCount / (double) reviewPageRequestDTO.getSize()));
+        int lastPage = (int) (Math.ceil(totalDataCount / (double) pageRequestDTO.getSize()));
         //전체 데이터를 기준으로 보여줄 실제 마지막 페이지, 전체 데이터가 105개면 11페이지로 보여줌
         endPage = Math.min(endPage, lastPage);
         //현재 페이지가 속한 페이지 번호 묶음의 끝 번호

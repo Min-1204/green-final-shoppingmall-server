@@ -1,8 +1,8 @@
 package kr.kro.moonlightmoist.shopapi.review.controller;
 
 import kr.kro.moonlightmoist.shopapi.aws.service.S3UploadService;
-import kr.kro.moonlightmoist.shopapi.review.dto.ReviewPageRequestDTO;
-import kr.kro.moonlightmoist.shopapi.review.dto.ReviewPageResponseDTO;
+import kr.kro.moonlightmoist.shopapi.review.dto.PageRequestDTO;
+import kr.kro.moonlightmoist.shopapi.review.dto.PageResponseDTO;
 import kr.kro.moonlightmoist.shopapi.review.dto.ReviewDTO;
 import kr.kro.moonlightmoist.shopapi.review.dto.ReviewImageUrlDTO;
 import kr.kro.moonlightmoist.shopapi.review.service.ReviewService;
@@ -26,35 +26,35 @@ public class ReviewController {
     private final S3UploadService s3UploadService;
 
     @GetMapping("/product/{productId}")
-    public ResponseEntity<ReviewPageResponseDTO<ReviewDTO>> getList(
+    public ResponseEntity<PageResponseDTO<ReviewDTO>> getList(
             @PathVariable("productId") Long productId,
             @RequestParam(defaultValue = "latest") String sort, //기본 최신순
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
             ) {
 
-        ReviewPageRequestDTO reviewPageRequestDTO = ReviewPageRequestDTO.builder()
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
             .page(page)
             .size(size)
             .build();
 
-        ReviewPageResponseDTO<ReviewDTO> reviews = reviewService.getList(productId, sort, reviewPageRequestDTO);
+        PageResponseDTO<ReviewDTO> reviews = reviewService.getList(productId, sort, pageRequestDTO);
         return ResponseEntity.ok(reviews);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<ReviewPageResponseDTO<ReviewDTO>> getMyReviews(
+    public ResponseEntity<PageResponseDTO<ReviewDTO>> getMyReviews(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
           ) {
 
-        ReviewPageRequestDTO reviewPageRequestDTO = ReviewPageRequestDTO.builder()
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
             .page(page)
             .size(size)
             .build();
 
-        ReviewPageResponseDTO<ReviewDTO> reviews = reviewService.getListByUser(userId, reviewPageRequestDTO);
+        PageResponseDTO<ReviewDTO> reviews = reviewService.getListByUser(userId, pageRequestDTO);
         return ResponseEntity.ok(reviews);
     }
 
