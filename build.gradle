@@ -65,6 +65,9 @@ dependencies {
 	//PortOne (포트원) Java Client V1
 	// 포트원 결제 SDK를 프로젝트에 추가
 	implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
+
+	// CoolSMS 공식 Java SDK
+	implementation 'net.nurigo:sdk:4.3.0'
 }
 
 tasks.named('test') {
