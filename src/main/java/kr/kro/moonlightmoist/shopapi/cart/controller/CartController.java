@@ -13,13 +13,13 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*", allowedHeaders = "*",
-        methods = {RequestMethod.GET,
-                RequestMethod.POST,
-                RequestMethod.PUT,
-                RequestMethod.DELETE,
-                RequestMethod.OPTIONS
-               })
+//@CrossOrigin(origins = "*", allowedHeaders = "*",
+//        methods = {RequestMethod.GET,
+//                RequestMethod.POST,
+//                RequestMethod.PUT,
+//                RequestMethod.DELETE,
+//                RequestMethod.OPTIONS
+//               })
 @RequestMapping("/api/cart")
 public class CartController {
     private final CartService cartService;

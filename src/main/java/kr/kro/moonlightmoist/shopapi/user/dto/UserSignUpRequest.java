@@ -50,12 +50,4 @@ public class UserSignUpRequest {
 
     private boolean smsAgreement; // SMS 마케팅 동의 알림
 
-
 }
-
-// ❌ 빼야 하는 것들:
-// private Long id;              // 자동 생성됨
-// private boolean deleted;      // 기본값 false
-// private LocalDate deletedAt;  // null
-// private UserRole userRole;    // 서버에서 지정
-// private UserGrade userGrade;  // 서버에서 지정

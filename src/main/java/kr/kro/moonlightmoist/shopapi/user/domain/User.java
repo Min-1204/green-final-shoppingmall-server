@@ -5,6 +5,7 @@ import kr.kro.moonlightmoist.shopapi.common.domain.BaseTimeEntity;
 import kr.kro.moonlightmoist.shopapi.user.dto.UserModifyRequest;
 import lombok.*;
 import org.hibernate.type.EntityType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -122,6 +123,13 @@ public class User extends BaseTimeEntity {
         this.deleted = true;
         this.deletedAt = LocalDateTime.now();
     }
+
+    // 12-10 추가 PasswordEncoder 사용
+    public void encodePassword (PasswordEncoder passwordEncoder) {
+        this.password = passwordEncoder.encode(this.password);
+        // 암호화 필드저장
+    }
+
 
 
 

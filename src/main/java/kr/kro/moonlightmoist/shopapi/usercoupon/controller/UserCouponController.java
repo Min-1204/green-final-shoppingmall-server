@@ -15,12 +15,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/usercoupon")
 @Slf4j
-@CrossOrigin(origins = "*", allowedHeaders = "*",
-        methods = {RequestMethod.GET,
-                RequestMethod.POST,
-                RequestMethod.PUT,
-                RequestMethod.DELETE,
-                RequestMethod.OPTIONS})
+//@CrossOrigin(origins = "*", allowedHeaders = "*",
+//        methods = {RequestMethod.GET,
+//                RequestMethod.POST,
+//                RequestMethod.PUT,
+//                RequestMethod.DELETE,
+//                RequestMethod.OPTIONS})
 @RequiredArgsConstructor
 public class UserCouponController {
 

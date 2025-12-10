@@ -16,13 +16,13 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*", allowedHeaders = "*",
-            methods = {RequestMethod.POST,
-                    RequestMethod.PUT,
-                    RequestMethod.GET,
-                    RequestMethod.DELETE,
-                    RequestMethod.OPTIONS
-            })
+//@CrossOrigin(origins = "*", allowedHeaders = "*",
+//            methods = {RequestMethod.POST,
+//                    RequestMethod.PUT,
+//                    RequestMethod.GET,
+//                    RequestMethod.DELETE,
+//                    RequestMethod.OPTIONS
+//            })
 @RequestMapping("/api/order")
 public class OrderController {
     private final OrderService orderService;

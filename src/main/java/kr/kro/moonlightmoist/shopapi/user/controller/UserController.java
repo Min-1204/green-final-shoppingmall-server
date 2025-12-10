@@ -1,6 +1,8 @@
 package kr.kro.moonlightmoist.shopapi.user.controller;
 
 
+import jakarta.servlet.http.HttpSession;
+import kr.kro.moonlightmoist.shopapi.security.CustomUserDetails;
 import kr.kro.moonlightmoist.shopapi.user.domain.User;
 import kr.kro.moonlightmoist.shopapi.user.dto.*;
 import kr.kro.moonlightmoist.shopapi.user.repository.UserRepository;
@@ -10,40 +12,107 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor // Final 생성
 @RequestMapping("/api/user") // 해당 컨트롤러가 받을 경로
 @Slf4j
-@CrossOrigin(origins = "*", // 교차 출처 -> 기본적인 보안정책
-        allowedHeaders = "*",   // 어떤해더를 받을것인지.
-        methods = {RequestMethod.GET,   // 허용할 메서드
-                RequestMethod.POST,
-                RequestMethod.PUT,
-                RequestMethod.DELETE,
-                RequestMethod.PATCH})
-
+//@CrossOrigin(origins = "http://localhost:5137")
 public class UserController {
     private final UserRepository userRepository;
     private final UserService userService;
     private final UserWithdrawalService userWithdrawalService;
+    private final AuthenticationManager authenticationManager; // 12-10 추가
 
     @PostMapping("/signup") // RequestMapping + ??
-    public ResponseEntity<String> userResister(@RequestBody UserSignUpRequest userSignUpRequest) {
+    public ResponseEntity<Map<String,Object>> userResister(@RequestBody UserSignUpRequest userSignUpRequest) {
         // @RequestBody JSON 데이터를 Java 객체로 자동 변환해주는 어노테이션
         User registeredUser = userRepository.save(userService.registerUser(userSignUpRequest));
         log.info("유저정보 Controller => {}"  ,userSignUpRequest);
-        log.info("DB에서 꺼낸 정보 => {}"  ,registeredUser);
-        return ResponseEntity.ok("성공");
+        log.info("DB에서 꺼낸 저장된 정보 => {}"  ,registeredUser);
+        Map<String,Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "회원가입이 완료되었습니다.");
+        return ResponseEntity.ok(response);
     }
 
 
     @PostMapping("/login")
-    public ResponseEntity<UserLoginResponse> Login (@RequestBody UserLoginRequest userLoginRequest) {
-        UserLoginResponse userLoginResponse = userService.login(userLoginRequest);
-        log.info("유저정보 Response: {}", userLoginResponse);
-        return ResponseEntity.ok(userLoginResponse);
+    public ResponseEntity<Map<String, Object>> Login (@RequestBody UserLoginRequest userLoginRequest, HttpSession session) {
+        log.info("로그인 요청 : {}", userLoginRequest.getLoginId());
+
+//        Authentication은 스프링 시큐리티에서 **'인증(Authentication)에 대한 모든 정보'**를 담는 최상위 개념의 인터페이스
+//        authenticate( 인증을 시작하는 핵심 메서드 ) 인증요청 객체를 받아서 해당 요청이 유효한지 확인하고 인증된 객체를 반환해준다.
+//        인터페이스는 두 가지 상태를 표현하기 위해 사용된다. 1. 인증요청 2. 인증완료
+
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            userLoginRequest.getLoginId(),
+                            userLoginRequest.getPassword()
+                    )
+            );
+
+//        SecurityContext에 저장하기.
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+//        사용자 정보
+//        Authentication 인터페이스의 정의상 getPrincipal() 메서드의 반환 타입은 가장 일반적인 타입인 Object 이다.
+//        이유는 getPrincipal()에 들어갈 수 있는 객체의 종류가 매우 다양하기 때문. ID 문자열일 수도 있고,
+//        OAuth2 토큰일 수도 있으며, 사용자님의 CustomUserDetails 객체일 수도 있기때문
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+            log.info("로그인 성공 LoginId : {}, SessionId : {}", userDetails.getUsername(), session.getId());
+
+//         응답 로직
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("massage", "로그인 성공");
+            response.put("user", UserLoginResponse.builder()
+                    .id(userDetails.getUser().getId())
+                    .loginId(userDetails.getUsername())
+                    .name(userDetails.getUser().getName())
+                    .build());
+            return ResponseEntity.ok(response);
+
+        } catch (AuthenticationException e) {
+            log.info("로그인 실패 여기는 catch LoginId : {}, Error 사유: {}", userLoginRequest.getLoginId(), e.getMessage());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success",false);
+            response.put("massage","아이디 또는 비밀번호가 일치하지 않습니다.");
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout (HttpSession session) {
+        String sessionId = session.getId();
+        log.info("1) 로그아웃 요청 sessionId : {}", sessionId);
+
+        // 세션 무효화
+        session.invalidate();
+
+        // SecurityContext 초기화
+        SecurityContextHolder.clearContext();
+
+        log.info("2) 로그아웃 완료 sessionId : {}", sessionId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "로그아웃 되었습니다.");
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/check-loginId")
@@ -62,6 +131,8 @@ public class UserController {
     // @RequestParam 방식은 쿼리파라미터를 보내는 방식으로 REST API 원칙과는 다른방식
     @GetMapping("/profile/{loginId}")
     public ResponseEntity<UserProfileResponse> getUserProfile (@PathVariable String loginId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("여기는 프로필조회 인증/인가 확인결과 :{}", authentication);
         UserProfileResponse profileResponse = userService.getUserProfile(loginId);
         return ResponseEntity.ok(profileResponse);
     }

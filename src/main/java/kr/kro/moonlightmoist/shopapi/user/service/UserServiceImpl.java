@@ -39,58 +39,47 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    @Override
-    public UserLoginResponse login(UserLoginRequest userLoginRequest) {
-        Optional<User> findLoginId = userRepository.findByLoginId(userLoginRequest.getLoginId());
-        if (findLoginId.isPresent()) {
-            User user = findLoginId.get();
-
-            if (!passwordEncoder.matches(userLoginRequest.getPassword(),user.getPassword())) {
-                throw new IllegalArgumentException("비밀번호가 일치 하지 않습니다.");
-            }
-            return UserLoginResponse.builder()
-                    .id(user.getId())
-                    .loginId(user.getLoginId())
-                    .name(user.getName())
-                    .build();
-        }
-        throw new IllegalArgumentException("없는 아이디 입니다.");
-    }
+//    @Override
+//    public UserLoginResponse login(UserLoginRequest userLoginRequest) {
+//        Optional<User> findLoginId = userRepository.findByLoginId(userLoginRequest.getLoginId());
+//        if (findLoginId.isPresent()) {
+//            User user = findLoginId.get();
+//
+//            if (!passwordEncoder.matches(userLoginRequest.getPassword(),user.getPassword())) {
+//                throw new IllegalArgumentException("비밀번호가 일치 하지 않습니다.");
+//            }
+//            return UserLoginResponse.builder()
+//                    .id(user.getId())
+//                    .loginId(user.getLoginId())
+//                    .name(user.getName())
+//                    .build();
+//        }
+//        throw new IllegalArgumentException("없는 아이디 입니다.");
+//    }
 
     @Override
     public boolean checkLoginId(String loginId) {
-        System.out.println("중복확인 Service");
-        System.out.println("조회한 loginId :" + loginId);
-        Optional<User> findUser = userRepository.findByLoginId(loginId);
-        if (findUser.isPresent()) {
-            System.out.println("DB에 해당 유저정보가 있습니다." + findUser.get().getLoginId());
-            return true;
-        } else {
-            System.out.println("DB에 해당 유저정보가 없습니다");
-            return false;
-        }
+        log.info("중복확인 Service 로그인아이디 : {}", loginId);
+        return userRepository.existsByLoginId(loginId);
     }
 
     @Override
     public UserProfileResponse getUserProfile(String loginId) {
-        Optional<User> findUser = userRepository.findByLoginId(loginId);
-        if (findUser.isPresent()) {
-            User user = findUser.get();
+        User findUser = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다 : " + loginId));
+
             return UserProfileResponse.builder()
-                    .loginId(user.getLoginId())
-                    .name(user.getName())
-                    .email(user.getEmail())
-                    .phoneNumber(user.getPhoneNumber())
-                    .birthDate(user.getBirthDate())
-                    .postalCode(user.getPostalCode())
-                    .address(user.getAddress())
-                    .addressDetail(user.getAddressDetail())
-                    .smsAgreement(user.isSmsAgreement())
-                    .emailAgreement(user.isEmailAgreement())
+                    .loginId(findUser.getLoginId())
+                    .name(findUser.getName())
+                    .email(findUser.getEmail())
+                    .phoneNumber(findUser.getPhoneNumber())
+                    .birthDate(findUser.getBirthDate())
+                    .postalCode(findUser.getPostalCode())
+                    .address(findUser.getAddress())
+                    .addressDetail(findUser.getAddressDetail())
+                    .smsAgreement(findUser.isSmsAgreement())
+                    .emailAgreement(findUser.isEmailAgreement())
                     .build();
-        } else {
-            throw new RuntimeException("사용자를 찾을 수 없습니다 :" + loginId);
-        }
     }
 
 
@@ -111,7 +100,7 @@ public class UserServiceImpl implements UserService {
         User updateUser = userRepository.save(user);
         // DB에 변경된 user를 저장 후 꺼내옴.
 
-        UserProfileResponse profileResponse = UserProfileResponse.from(updateUser);
+        UserProfileResponse profileResponse = UserProfileResponse.toUserProfileResponse(updateUser);
         // UserProfileResponse의 from 메서드를 호출함과 동시에 업데이트 된 유저를 전달
         // 반환된 UserProfileResponse를 profileResponse에 할당
         return new UserModifyResponse(true, "개인정보 수정이 완료 되었습니다.", profileResponse);

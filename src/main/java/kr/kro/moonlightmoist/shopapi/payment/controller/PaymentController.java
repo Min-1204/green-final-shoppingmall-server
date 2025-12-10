@@ -12,14 +12,14 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/payments")
-@CrossOrigin(origins = "*", allowedHeaders = "*",
-            methods = {
-                RequestMethod.GET,
-                    RequestMethod.DELETE,
-                    RequestMethod.POST,
-                    RequestMethod.OPTIONS,
-                    RequestMethod.PUT
-            })
+//@CrossOrigin(origins = "*", allowedHeaders = "*",
+//            methods = {
+//                RequestMethod.GET,
+//                    RequestMethod.DELETE,
+//                    RequestMethod.POST,
+//                    RequestMethod.OPTIONS,
+//                    RequestMethod.PUT
+//            })
 public class PaymentController {
     private final PaymentService paymentService;
 

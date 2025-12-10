@@ -23,7 +23,7 @@ public class UserProfileResponse {
     private boolean emailAgreement;
     private boolean smsAgreement;
 
-    public static UserProfileResponse from (User user) {
+    public static UserProfileResponse toUserProfileResponse(User user) {
         return UserProfileResponse.builder()
                 .loginId(user.getLoginId())
                 .name(user.getName())
