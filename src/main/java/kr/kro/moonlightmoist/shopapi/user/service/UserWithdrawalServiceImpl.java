@@ -9,6 +9,7 @@ import kr.kro.moonlightmoist.shopapi.user.repository.UserRepository;
 import kr.kro.moonlightmoist.shopapi.user.repository.UserWithdrawalRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -19,6 +20,7 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
 
     private final UserRepository userRepository;
     private final UserWithdrawalRepository userWithdrawalRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserWithdrawalResponse withdrawUser(UserWithdrawalRequest request) {
@@ -32,7 +34,7 @@ public class UserWithdrawalServiceImpl implements UserWithdrawalService {
                     .build();
         }
 
-        if(!user.getPassword().equals(request.getPassword())) {
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             return UserWithdrawalResponse.builder()
                     .success(false)
                     .message("비밀번호가 일치하지 않습니다.")

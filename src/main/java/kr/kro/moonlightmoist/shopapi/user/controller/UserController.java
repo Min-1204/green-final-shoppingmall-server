@@ -71,6 +71,8 @@ public class UserController {
 //        OAuth2 토큰일 수도 있으며, 사용자님의 CustomUserDetails 객체일 수도 있기때문
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
+            session.setAttribute("SPRING_SECURITY_CONTEXT",SecurityContextHolder.getContext());
+
             log.info("로그인 성공 LoginId : {}, SessionId : {}", userDetails.getUsername(), session.getId());
 
 //         응답 로직

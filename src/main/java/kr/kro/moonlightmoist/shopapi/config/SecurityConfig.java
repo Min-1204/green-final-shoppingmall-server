@@ -29,7 +29,7 @@ public class SecurityConfig {
 
                 // 세션 설정
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)// 필요시 세션 생성
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)// 필요시 세션 생성
                         .maximumSessions(1) // 동시 로그인 설정
                         .maxSessionsPreventsLogin(false) // 새 로그인이 기존 세션 만료
                 )
@@ -41,7 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/check-loginId").permitAll()
                         .requestMatchers("/api/categories", "/api/products/**").permitAll()
 
-                        .requestMatchers("/api/user/profile/**").authenticated()
+                        .requestMatchers("/api/user/**").authenticated()
                         .anyRequest().authenticated());
 //            anyRequest() 모든요청을 의미, premitAll() 모든요청 허용
         return http.build(); // 해당 http를 만들어서 반환
