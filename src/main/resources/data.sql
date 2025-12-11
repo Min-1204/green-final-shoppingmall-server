@@ -352,7 +352,7 @@ VALUES
 (1,'user1','$2a$10$6qw3yYsjV9MYb6FDQnwPOOtoKIgOm9my7xw4yWeuY4CaX/fA3LRFW','사용자1','01011111111','user1@test.com','1996-01-01','11111','서울시 강남구','101호',true,true,false,NULL,'USER','BRONZE',NOW(),NOW()), -- pw1
 (2,'user2','$2a$10$IbDZlbdF40gBOiwzG1mdeuO5qYwtfnZhn2gZM/pv3qdaH9qfuHEo.','사용자2','01022222222','user2@test.com','1996-02-02','22222','서울시 강북구','102호',true,true,false,NULL,'USER','BRONZE',NOW(),NOW()), -- pw2
 (3,'user3','$2a$10$S2oOm7Lu5R5LcYdtK8d2I.9kNXaF86rTUUPDTUeUgXHTpT9MJiR3S','사용자3','01033333333','user3@test.com','1996-03-03','33333','서울시 송파구','103호',true,true,false,NULL,'USER','BRONZE',NOW(),NOW()), -- pw3
-(4,'user4','$2a$10$1x8TArF9Cnvm5gEDyTCax.uzWL7AKOTt86AJqcW5utqqLWIDrhwLa','사용자4','01044444444','user4@test.com','1996-04-04','44444','서울시 영등포구','104호',true,true,false,NULL,'USER','BRONZE',NOW(),NOW()), -- pw4
+(4,'user4','$2a$10$1x8TArF9Cnvm5gEDyTCax.uzWL7AKOTt86AJqcW5utqqLWIDrhwLa','사용자4','01046624036','user4@test.com','1992-12-25','44444','서울시 영등포구','104호',true,true,false,NULL,'USER','BRONZE',NOW(),NOW()), -- pw4
 (5,'user5','$2a$10$spuiucMhP0dXXkoczVqjEOP.K77uvjIq6Uq6JXZGQW8q47JuSB.3O','사용자5','01055555555','user5@test.com','1996-05-05','55555','서울시 마포구','105호',true,true,false,NULL,'USER','BRONZE',NOW(),NOW()), -- pw5
 (6,'user','$2a$10$jmrm8qUUoTnz/r2XW6hWeOZOtvO9SAUI2rnsFUcCkbNZTDqs6mSYG','유저','01012345677','user@naver.com','2025-12-08','12345','성남시 미금역','그린아카데미',false,true,false,NULL,'USER','BRONZE',NOW(),NOW()), -- a
 (7,'admin','$2a$10$zzjjAVRFjyLxdWpR4HPmbOCLmS2C8LeEAURv5lQtLgMPpVBe5sfZi','관리자','01012345678','admin@naver.com','2025-12-08','12345','성남시 미금역','그린아카데미',false,true,false,NULL,'ADMIN','VIP',NOW(),NOW()); -- a
