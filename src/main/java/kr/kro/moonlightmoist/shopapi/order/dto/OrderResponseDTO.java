@@ -22,6 +22,7 @@ public class OrderResponseDTO {
     private int deliveryFee;
     private int discountAmount;
     private int usedPoints;
+    private int earnedPoints;
     private int finalAmount;
     private String receiverName;
     private String receiverPhone;

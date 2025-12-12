@@ -15,5 +15,6 @@ public interface OrderService {
     void completeOrder(String merchantUid);
     void deleteOneOrder(Long orderId);
     List<OrderResBySearch> searchOrdersByCondition(OrderSearchCondition condition);
+    void comfirmOrder(Long orderId);
 
 }

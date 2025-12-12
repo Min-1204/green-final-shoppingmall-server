@@ -91,6 +91,7 @@ public class OrderServiceImpl implements OrderService{
                 .detailedAddress(order.getDetailedAddress())
                 .discountAmount(order.getDiscountAmount())
                 .usedPoints(order.getUsedPoints())
+                .earnedPoints(order.getEarnedPoints())
                 .finalAmount(order.getFinalAmount())
                 .expectedDeliveryDate(order.getExpectedDeliveryDate())
                 .receiverName(order.getReceiverName())
@@ -249,6 +250,14 @@ public class OrderServiceImpl implements OrderService{
         List<Order> orderList = orderRepository.search(condition);
         List<OrderResBySearch> orderResBySearches = orderList.stream().map(o->o.toDtoForOrderResBySearch()).toList();
         return orderResBySearches;
+    }
+
+    @Override
+    public void comfirmOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId).get();
+        for(OrderProduct orderProduct : order.getOrderProducts()){
+            orderProduct.updateStatus(OrderProductStatus.CONFIRMED);
+        }
     }
 
 }

@@ -63,4 +63,10 @@ public class OrderController {
 
         return ResponseEntity.ok(orderResBySearches);
     }
+
+    @PutMapping("/confirm/{orderId}")
+    public ResponseEntity<String> confirmOrder(@PathVariable Long orderId) {
+        orderService.comfirmOrder(orderId);
+        return ResponseEntity.ok("ok");
+    }
 }

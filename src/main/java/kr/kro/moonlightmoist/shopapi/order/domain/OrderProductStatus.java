@@ -11,6 +11,8 @@ public enum OrderProductStatus {
     SHIPPING,
     //배송 완료
     DELIVERED,
+    // 구매 확정
+    CONFIRMED,
     //취소 신청
     CANCEL_REQUESTED,
     // 취소 완료
