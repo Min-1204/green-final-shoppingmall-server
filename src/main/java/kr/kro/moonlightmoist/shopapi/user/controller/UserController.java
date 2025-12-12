@@ -3,6 +3,7 @@ package kr.kro.moonlightmoist.shopapi.user.controller;
 
 import jakarta.servlet.http.HttpSession;
 import kr.kro.moonlightmoist.shopapi.security.CustomUserDetails;
+import kr.kro.moonlightmoist.shopapi.security.JwtTokenProvider;
 import kr.kro.moonlightmoist.shopapi.user.domain.User;
 import kr.kro.moonlightmoist.shopapi.user.dto.*;
 import kr.kro.moonlightmoist.shopapi.user.repository.UserRepository;
@@ -32,6 +33,7 @@ public class UserController {
     private final UserService userService;
     private final UserWithdrawalService userWithdrawalService;
     private final AuthenticationManager authenticationManager; // 12-10 추가
+    private final JwtTokenProvider jwtTokenProvider; // 12-12 추가
 
     @PostMapping("/signup") // RequestMapping + ??
     public ResponseEntity<Map<String,Object>> userResister(@RequestBody UserSignUpRequest userSignUpRequest) {
@@ -47,7 +49,7 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> Login (@RequestBody UserLoginRequest userLoginRequest, HttpSession session) {
+    public ResponseEntity<Map<String, Object>> Login (@RequestBody UserLoginRequest userLoginRequest) {
         log.info("로그인 요청 : {}", userLoginRequest.getLoginId());
 
 //        Authentication은 스프링 시큐리티에서 **'인증(Authentication)에 대한 모든 정보'**를 담는 최상위 개념의 인터페이스
@@ -65,20 +67,25 @@ public class UserController {
 //        SecurityContext에 저장하기.
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
+            String jwtToken = jwtTokenProvider.generateToken(authentication);
+
 //        사용자 정보
 //        Authentication 인터페이스의 정의상 getPrincipal() 메서드의 반환 타입은 가장 일반적인 타입인 Object 이다.
 //        이유는 getPrincipal()에 들어갈 수 있는 객체의 종류가 매우 다양하기 때문. ID 문자열일 수도 있고,
 //        OAuth2 토큰일 수도 있으며, 사용자님의 CustomUserDetails 객체일 수도 있기때문
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-            session.setAttribute("SPRING_SECURITY_CONTEXT",SecurityContextHolder.getContext());
-
-            log.info("로그인 성공 LoginId : {}, SessionId : {}", userDetails.getUsername(), session.getId());
+            log.info("로그인 성공 로그인아이디: {}, JWT 생성 및 발급 완료", userDetails.getUser().getLoginId());
+            
+            // 세션 방식
+//            session.setAttribute("SPRING_SECURITY_CONTEXT",SecurityContextHolder.getContext());
+//            log.info("로그인 성공 LoginId : {}, SessionId : {}", userDetails.getUsername(), session.getId());
 
 //         응답 로직
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("massage", "로그인 성공");
+            response.put("token", jwtToken);
             response.put("user", UserLoginResponse.builder()
                     .id(userDetails.getUser().getId())
                     .loginId(userDetails.getUsername())
@@ -98,17 +105,11 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout (HttpSession session) {
-        String sessionId = session.getId();
-        log.info("1) 로그아웃 요청 sessionId : {}", sessionId);
+    public ResponseEntity<?> logout () {
+        // JWT 방식에서는 서버가 할 일이 없다.
+        // 클라이언트가 토큰을 삭제하면 끝. (로컬스토리지)
 
-        // 세션 무효화
-        session.invalidate();
-
-        // SecurityContext 초기화
-        SecurityContextHolder.clearContext();
-
-        log.info("2) 로그아웃 완료 sessionId : {}", sessionId);
+        log.info("로그아웃 요청");
 
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);

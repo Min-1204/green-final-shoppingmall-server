@@ -1,5 +1,7 @@
 package kr.kro.moonlightmoist.shopapi.config;
 
+import kr.kro.moonlightmoist.shopapi.security.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -8,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -16,7 +19,10 @@ import java.util.List;
 
 @Configuration // 스프링부트가 시작할 때 해당 클래스를 스캔 그안의 설정들을 읽어서 적용
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean // "이 메소드가 반환하는 객체를 스프링이 관리해줘"
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -29,10 +35,15 @@ public class SecurityConfig {
 
                 // 세션 설정
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)// 필요시 세션 생성
-                        .maximumSessions(1) // 동시 로그인 설정
-                        .maxSessionsPreventsLogin(false) // 새 로그인이 기존 세션 만료
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 무상태, 세션 생성 안함.
                 )
+
+                // 만든 JWT 필터를 Spring Secuirity에 추가.
+                // 특정 필터를 등록하는 역할
+                // 첫 번째 인자로 등록 필터를 전달하고, 두 번째 인자로 등록할 위치 전달
+                // UsernamePasswordAuthenticationFilter는 Spring Security에서 기본적으로 제공하는 폼 인증 처리 필터
+                .addFilterBefore(jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class) // 이 필터보다 먼저 실행?
 
                 // 어떤 요청을 허용하고, 막을지를 설정하는 메서드
                 .authorizeHttpRequests(auth -> auth
