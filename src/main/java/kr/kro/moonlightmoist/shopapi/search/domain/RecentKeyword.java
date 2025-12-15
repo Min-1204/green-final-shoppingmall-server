@@ -7,13 +7,14 @@ import lombok.*;
 
 
 @Entity
-@Table(name = "search_histories")
+@Table(name = "recent_search_keyword")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @ToString
-public class SearchHistory extends BaseTimeEntity {
+public class RecentKeyword extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,4 +29,7 @@ public class SearchHistory extends BaseTimeEntity {
 
     @Column(nullable = false, length = 150)
     private String keyword;
+
+    @Column(nullable = false)
+    private Boolean isVisible = true; // 프론트에서 삭제/숨김 처리용
 }

@@ -12,4 +12,8 @@ public interface SearchHistoryService {
     List<SearchRecentKeywordResponseDTO> getRecentKeywordList(Long userId, String guestId);
     //실시간 인기 검색어 목록 가져오기
     List<SearchPopularKeywordResponseDTO> getPoularKeywordList();
+    //최근 검색어 개별 삭제
+    void deleteOneRecentKeyword(Long userId, String guestId, String keyword);
+    //최근 검색어 전체 삭제
+    void deleteAllRecentKeywords(Long userId, String guestId);
 }

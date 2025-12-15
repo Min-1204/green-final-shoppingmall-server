@@ -75,4 +75,29 @@ public class SearchHistoryController {
 
         return ResponseEntity.ok(productResForLists);
     }
+
+    @DeleteMapping("/recent/one")
+    public ResponseEntity<Void> deleteOneRecentKeyword(
+            @RequestParam String keyword,
+            @RequestParam(required = false) Long userId,
+            HttpServletRequest request
+    ) {
+        String guestId = (String) request.getAttribute("guestId");
+
+        searchHistoryService.deleteOneRecentKeyword(userId, guestId, keyword);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("recent/all")
+    public ResponseEntity<Void> deleteAllRecentKeyword(
+            @RequestParam(required = false) Long userId,
+            HttpServletRequest request
+    ) {
+        String guestId = (String) request.getAttribute("guestId");
+
+        searchHistoryService.deleteAllRecentKeywords(userId, guestId);
+
+        return ResponseEntity.ok().build();
+    }
 }

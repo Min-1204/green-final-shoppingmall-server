@@ -13,5 +13,5 @@ import java.time.LocalDateTime;
 public class SearchPopularKeywordResponseDTO {
     private String keyword;
     private int count;
-    private LocalDateTime createdAt;
+    private LocalDateTime lastSearchedAt;
 }
