@@ -3,6 +3,7 @@ package kr.kro.moonlightmoist.shopapi.order.domain;
 import jakarta.persistence.*;
 import kr.kro.moonlightmoist.shopapi.common.domain.BaseTimeEntity;
 import kr.kro.moonlightmoist.shopapi.order.dto.OrderProductResBySearch;
+import kr.kro.moonlightmoist.shopapi.product.domain.ImageType;
 import kr.kro.moonlightmoist.shopapi.product.domain.Product;
 import kr.kro.moonlightmoist.shopapi.product.domain.ProductOption;
 import lombok.*;
@@ -52,9 +53,10 @@ public class OrderProduct extends BaseTimeEntity {
                 .id(this.getId())
                 .productName(this.getProductOption().getProduct().getBasicInfo().getProductName())
                 .productOptionName(this.getProductOption().getOptionName())
-                .orderProductStatus(this.getOrderProductStatus())
                 .quantity(this.getQuantity())
+                .imageUrl(this.getProductOption().getProduct().getMainImages().stream().filter(i->i.getImageType()== ImageType.THUMBNAIL).findFirst().get().getImageUrl())
                 .totalAmount(this.getPurchasedPrice()*this.getQuantity())
+                .orderProductStatus(this.getOrderProductStatus())
                 .build();
         return orderProductRes;
     }

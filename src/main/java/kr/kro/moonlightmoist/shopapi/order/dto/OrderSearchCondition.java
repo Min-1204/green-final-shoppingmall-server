@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderSearchCondition {
+    private Long userId;
     private String orderNumber;
     private String ordererName;
     private String productName;

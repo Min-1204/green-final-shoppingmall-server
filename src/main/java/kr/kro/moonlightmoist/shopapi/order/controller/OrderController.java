@@ -11,6 +11,7 @@ import kr.kro.moonlightmoist.shopapi.review.dto.PageRequestDTO;
 import kr.kro.moonlightmoist.shopapi.review.dto.PageResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,10 +71,18 @@ public class OrderController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<List<OrderResBySearch>> searchOrdersByCondition(@RequestBody OrderSearchCondition condition) {
-        List<OrderResBySearch> orderResBySearches = orderService.searchOrdersByCondition(condition);
+    public ResponseEntity<PageResponseDTO<OrderResBySearch>> searchOrdersByCondition(
+            @RequestBody OrderSearchCondition condition,
+            @RequestParam(defaultValue = "latest") String sort,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
+                .page(page)
+                .size(size)
+                .build();
 
-        return ResponseEntity.ok(orderResBySearches);
+        return ResponseEntity.ok(orderService.searchOrdersByCondition(condition, sort, pageRequestDTO));
     }
 
     @PutMapping("/confirm/{orderId}")

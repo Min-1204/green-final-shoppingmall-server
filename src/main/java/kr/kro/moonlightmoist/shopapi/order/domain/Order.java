@@ -144,11 +144,11 @@ public class Order extends BaseTimeEntity {
         OrderResBySearch orderRes = OrderResBySearch.builder()
                 .id(this.getId())
                 .orderDate(this.getCreatedAt().toLocalDate())
-                .ordererName(this.user.getName())
-                .receiverName(this.getReceiverName())
                 .orderNumber(this.getOrderNumber())
-                .paymentMethod(this.getPaymentMethod())
                 .orderProducts(this.getOrderProducts().stream().map(op -> op.toDtoForOrderProductResBySearch()).toList())
+                .receiverName(this.getReceiverName())
+                .ordererName(this.user.getName())
+                .paymentMethod(this.getPaymentMethod())
                 .build();
         return orderRes;
     }

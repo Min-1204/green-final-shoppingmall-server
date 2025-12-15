@@ -3,6 +3,7 @@ package kr.kro.moonlightmoist.shopapi.order.service;
 import kr.kro.moonlightmoist.shopapi.order.dto.*;
 import kr.kro.moonlightmoist.shopapi.review.dto.PageRequestDTO;
 import kr.kro.moonlightmoist.shopapi.review.dto.PageResponseDTO;
+import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,7 +17,7 @@ public interface OrderService {
     // 결제 검증이 끝나고 주문 상품 상태를 결제 완료로 변경
     void completeOrder(String merchantUid);
     void deleteOneOrder(Long orderId);
-    List<OrderResBySearch> searchOrdersByCondition(OrderSearchCondition condition);
+    PageResponseDTO<OrderResBySearch> searchOrdersByCondition(OrderSearchCondition condition, String sort, PageRequestDTO pageRequestDTO);
     void comfirmOrder(Long orderId);
 
 }

@@ -227,10 +227,27 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public List<OrderResBySearch> searchOrdersByCondition(OrderSearchCondition condition) {
-        List<Order> orderList = orderRepository.search(condition);
-        List<OrderResBySearch> orderResBySearches = orderList.stream().map(o->o.toDtoForOrderResBySearch()).toList();
-        return orderResBySearches;
+    public PageResponseDTO<OrderResBySearch> searchOrdersByCondition(OrderSearchCondition condition, String sort, PageRequestDTO pageRequestDTO) {
+        // 1. Pageable 객체 생성
+        int page = pageRequestDTO.getPage() - 1;
+        int size = pageRequestDTO.getSize() == null ? 10 : pageRequestDTO.getSize();
+        // sort 설정 (Pageable에 맞게 컬럼명 정확히 지정)
+        Sort sortBy = "latest".equals(sort) ? Sort.by("createdAt").descending() : Sort.by("createdAt").descending();
+
+        //Pageable 객체 생성
+        Pageable pageable = PageRequest.of(page, size, sortBy);
+
+        // 2. Page<Order> 객체로 받음
+        Page<Order> orderPage = orderRepository.search(condition, pageable);
+
+        // 3. List<OrderResBySearch> 생성
+        List<OrderResBySearch> ListOforderResBySearch = orderPage.getContent().stream().map(o->o.toDtoForOrderResBySearch()).toList();
+
+        return PageResponseDTO.<OrderResBySearch>withAll()
+                .dtoList(ListOforderResBySearch)
+                .pageRequestDTO(pageRequestDTO)
+                .totalDataCount(orderPage.getTotalElements())
+                .build();
     }
 
     @Override
