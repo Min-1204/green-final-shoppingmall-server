@@ -1,5 +1,10 @@
 package kr.kro.moonlightmoist.shopapi.search.service;
 
+import kr.kro.moonlightmoist.shopapi.product.domain.Product;
+import kr.kro.moonlightmoist.shopapi.product.dto.ProductResForList;
+import kr.kro.moonlightmoist.shopapi.product.dto.ProductSearchCondition;
+import kr.kro.moonlightmoist.shopapi.review.dto.PageRequestDTO;
+import kr.kro.moonlightmoist.shopapi.review.dto.PageResponseDTO;
 import kr.kro.moonlightmoist.shopapi.search.dto.SearchPopularKeywordResponseDTO;
 import kr.kro.moonlightmoist.shopapi.search.dto.SearchRecentKeywordResponseDTO;
 
@@ -16,4 +21,9 @@ public interface SearchHistoryService {
     void deleteOneRecentKeyword(Long userId, String guestId, String keyword);
     //최근 검색어 전체 삭제
     void deleteAllRecentKeywords(Long userId, String guestId);
+
+    List<Product> searchProductByConditonPage(
+            ProductSearchCondition condition,
+            PageRequestDTO pageRequestDTO
+    );
 }

@@ -4,11 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import kr.kro.moonlightmoist.shopapi.product.dto.ProductResForList;
 import kr.kro.moonlightmoist.shopapi.product.dto.ProductSearchCondition;
 import kr.kro.moonlightmoist.shopapi.product.service.ProductService;
+import kr.kro.moonlightmoist.shopapi.review.dto.PageResponseDTO;
 import kr.kro.moonlightmoist.shopapi.search.dto.SearchPopularKeywordResponseDTO;
 import kr.kro.moonlightmoist.shopapi.search.dto.SearchRecentKeywordResponseDTO;
 import kr.kro.moonlightmoist.shopapi.search.service.SearchHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
@@ -56,14 +58,19 @@ public class SearchHistoryController {
     }
 
     @GetMapping("/product")
-    public ResponseEntity<List<ProductResForList>> getProductResForList(@RequestParam("keyword") String keyword) {
+    public ResponseEntity<PageResponseDTO<ProductResForList>> getProductResForList(
+            @RequestParam("keyword") String keyword,
+            @RequestParam Integer page,
+            @RequestParam Integer size
+    ) {
+        log.info("keyword => {}, page => {}, size => {}", keyword, page, size);
 
         ProductSearchCondition condition = new ProductSearchCondition();
         condition.setSearchKeywords(keyword);
 
-        List<ProductResForList> productResForLists = productService.searchProductsByCondition(condition);
+        PageResponseDTO<ProductResForList> result = productService.searchProductsByConditionWithPaging(condition, page, size);
 
-        return ResponseEntity.ok(productResForLists);
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/recent/one")

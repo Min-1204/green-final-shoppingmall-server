@@ -3,6 +3,7 @@ package kr.kro.moonlightmoist.shopapi.product.service;
 import kr.kro.moonlightmoist.shopapi.product.dto.*;
 import kr.kro.moonlightmoist.shopapi.review.dto.PageRequestDTO;
 import kr.kro.moonlightmoist.shopapi.review.dto.PageResponseDTO;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -17,6 +18,8 @@ public interface ProductService {
     ProductResForDetail searchProductById(Long id);
     // 관리자페이지에서 검색 조건으로 상품 리스트 조회
     List<ProductResForList> searchProductsByCondition(ProductSearchCondition condition);
+    // 검색조건으로 상품 리스트 조회 페이징처리
+    PageResponseDTO<ProductResForList> searchProductsByConditionWithPaging(ProductSearchCondition condition,int page, int size );
     // 상품 수정
     Long modify(Long id, ProductRequest dto);
 

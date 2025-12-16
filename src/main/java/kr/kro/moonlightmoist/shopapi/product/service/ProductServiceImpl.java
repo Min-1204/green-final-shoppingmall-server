@@ -171,6 +171,23 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
+    public PageResponseDTO<ProductResForList> searchProductsByConditionWithPaging(ProductSearchCondition condition, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<Product> pages = productRepository.searchByConditionWithPaging(condition, pageable);
+//        List<ProductResForList> productsRes = productList.stream().map(p -> p.toDTOForList()).toList();
+
+        List<ProductResForList> dtoList = pages.get().map(product -> product.toDTOForList()).toList();
+
+        PageResponseDTO<ProductResForList> response = PageResponseDTO.<ProductResForList>withAll()
+                .dtoList(dtoList)
+                .pageRequestDTO(PageRequestDTO.builder().page(page).size(size).build())
+                .totalDataCount(pages.getTotalElements())
+                .build();
+
+        return response;
+    }
+
+    @Override
     @Transactional
     public Long modify(Long id, ProductRequest dto) {
         Product product = productRepository.findById(id)
