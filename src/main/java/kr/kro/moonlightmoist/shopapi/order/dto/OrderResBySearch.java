@@ -20,5 +20,6 @@ public class OrderResBySearch {
     private String receiverName;
     private String ordererName;
     private String paymentMethod;
+    private int earnedPoints;
 
 }

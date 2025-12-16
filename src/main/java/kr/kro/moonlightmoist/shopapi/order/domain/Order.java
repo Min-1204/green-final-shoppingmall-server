@@ -149,6 +149,7 @@ public class Order extends BaseTimeEntity {
                 .receiverName(this.getReceiverName())
                 .ordererName(this.user.getName())
                 .paymentMethod(this.getPaymentMethod())
+                .earnedPoints(this.getEarnedPoints())
                 .build();
         return orderRes;
     }
