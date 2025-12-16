@@ -29,27 +29,17 @@ public class SearchHistoryController {
     public ResponseEntity<Void> searchAdd(
             @RequestParam String keyword,
             @RequestParam(required = false) Long userId,
-            HttpServletRequest request
+            @RequestParam(required = false) String guestId
     ) {
-
-        String guestId = (String) request.getAttribute("guestId");
         searchHistoryService.searchAdd(userId, guestId, keyword);
-
-        log.info("==== add keyword: {}", keyword);
-        log.info("==== add userId: {}", userId);
-
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/recent")
     public ResponseEntity<List<SearchRecentKeywordResponseDTO>> getRecentKeywords(
             @RequestParam(required = false) Long userId,
-            HttpServletRequest request
+            @RequestParam(required = false) String guestId
     ) {
-
-        String guestId  = (String) request.getAttribute("guestId");
-        log.info("==== recent guestId: {}", guestId);
-
         List<SearchRecentKeywordResponseDTO> recentList =
                 searchHistoryService.getRecentKeywordList(userId, guestId);
 
@@ -80,24 +70,18 @@ public class SearchHistoryController {
     public ResponseEntity<Void> deleteOneRecentKeyword(
             @RequestParam String keyword,
             @RequestParam(required = false) Long userId,
-            HttpServletRequest request
+            @RequestParam(required = false) String guestId
     ) {
-        String guestId = (String) request.getAttribute("guestId");
-
         searchHistoryService.deleteOneRecentKeyword(userId, guestId, keyword);
-
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("recent/all")
+    @DeleteMapping("/recent/all")
     public ResponseEntity<Void> deleteAllRecentKeyword(
             @RequestParam(required = false) Long userId,
-            HttpServletRequest request
+            @RequestParam(required = false) String guestId
     ) {
-        String guestId = (String) request.getAttribute("guestId");
-
         searchHistoryService.deleteAllRecentKeywords(userId, guestId);
-
         return ResponseEntity.ok().build();
     }
 }

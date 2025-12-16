@@ -27,4 +27,19 @@ public interface RecentKeywordRepository extends JpaRepository<RecentKeyword, Lo
             "LIMIT 20", nativeQuery = true)
     List<RecentKeyword> findByGuestIdRecent(@Param("guestId") String guestId);
 
+    @Query("""
+            SELECT rk FROM RecentKeyword rk
+            WHERE rk.user.id = :userId
+            AND rk.keyword = :keyword
+            AND rk.isVisible = true
+            """)
+    List<RecentKeyword> findVisibleByUserIdAndKeyword(@Param("userId") Long userId, @Param("keyword") String keyword);
+
+    @Query("""
+            SELECT rk FROM RecentKeyword rk
+            WHERE rk.guestId = :guestId
+            AND rk.keyword = :keyword
+            AND rk.isVisible = true
+            """)
+    List<RecentKeyword> findVisibleByGuestIdAndKeyword(@Param("guestId") String guestId, @Param("keyword") String keyword);
 }

@@ -78,15 +78,15 @@ public class SearchHistoryServiceImpl implements SearchHistoryService{
 
         List<SearchRecentKeywordResponseDTO> recentKeywordResDTOList = new ArrayList<>();
 
-        for (RecentKeyword keyword : recentKeywords) {
+        for (RecentKeyword rk : recentKeywords) {
             //null이 아니고, 빈 문자열 or 공백이 아닐때
-            if (keyword.getKeyword() != null && !keyword.getKeyword().isBlank()) {
+            if (rk.getKeyword() != null && !rk.getKeyword().isBlank()) {
 
                 boolean duplicateCheck = false;
                 //SearchRecentKeywordResponseDTO의 키워드와 SearchHistory의 키워드가 같으면
                 //내부 for문을 빠져나오고
                 for (SearchRecentKeywordResponseDTO dto : recentKeywordResDTOList) {
-                    if (dto.getKeyword().equals(keyword.getKeyword())) {
+                    if (dto.getKeyword().equals(rk.getKeyword())) {
                         duplicateCheck = true;
                         break;
                     }
@@ -97,8 +97,8 @@ public class SearchHistoryServiceImpl implements SearchHistoryService{
                 //새로운 keyword면 DTO로 매핑해서 SearchRecentKeywordResponseDTO List에 저장
                 SearchRecentKeywordResponseDTO recentKeywordResDTO = SearchRecentKeywordResponseDTO
                         .builder()
-                        .keyword(keyword.getKeyword())
-                        .createdAt(keyword.getCreatedAt())
+                        .keyword(rk.getKeyword())
+                        .createdAt(rk.getCreatedAt())
                         .build();
                 recentKeywordResDTOList.add(recentKeywordResDTO);
 
@@ -137,18 +137,15 @@ public class SearchHistoryServiceImpl implements SearchHistoryService{
         List<RecentKeyword> targetKeyword;
 
         if (user != null) {
-            targetKeyword = recentKeywordRepository.findByUserIdRecent(userId);
+            targetKeyword = recentKeywordRepository.findVisibleByUserIdAndKeyword(userId, keyword);
         } else if (guestId != null) {
-            targetKeyword = recentKeywordRepository.findByGuestIdRecent(guestId);
+            targetKeyword = recentKeywordRepository.findVisibleByGuestIdAndKeyword(guestId, keyword);
         } else return;
 
         for (RecentKeyword rk : targetKeyword) {
-            if (rk.getKeyword().equals(keyword)) {
-                rk.setIsVisible(false); //실제 DB 삭제 대신 숨김 처리
-                recentKeywordRepository.save(rk);
-                break;
-            }
+            rk.setIsVisible(false); //실제 DB 삭제 대신 숨김 처리
         }
+        recentKeywordRepository.saveAll(targetKeyword);
     }
 
     @Override
