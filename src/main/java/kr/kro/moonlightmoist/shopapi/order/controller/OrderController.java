@@ -66,7 +66,9 @@ public class OrderController {
     @DeleteMapping("")
     public ResponseEntity<String> deleteOneOrder(@RequestParam Long orderId) {
         log.info("deleteOneOrder 메서드 실행 orderId:{}", orderId);
-        orderService.deleteOneOrder(orderId);
+        orderService.deleteOneOrder(orderId); // 주문 삭제(주문 상품 삭제, 주문 쿠폰 삭제, 유저 쿠폰 회복, 주문 삭제)
+
+        pointHistoryService.rollbackPoint(orderId); // 포인트 롤백
         return ResponseEntity.ok("삭제 성공");
     }
 

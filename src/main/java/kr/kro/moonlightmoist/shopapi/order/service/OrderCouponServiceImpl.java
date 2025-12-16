@@ -24,13 +24,14 @@ public class OrderCouponServiceImpl implements OrderCouponService{
 
     @Override
     public int calcAndUseCoupon(int totalProductAmount, Long userCouponId) {
-        log.info("OrderCouponServiceImpl -> userCouponId:{}",userCouponId);
+//        log.info("OrderCouponServiceImpl -> userCouponId:{}",userCouponId);
         if(userCouponId != null) {
             UserCoupon userCoupon = userCouponRepository.findById(userCouponId).get();
             Coupon coupon = userCoupon.getCoupon();
+            // 최소 주문 금액 제한이 없거나 최소 주문 금액보다 더 많이 주문했을때
             if (!coupon.getLimitMinOrderAmount() || (coupon.getLimitMinOrderAmount() && (totalProductAmount >= coupon.getMinOrderAmount()))) {
-                if (coupon.getDiscountType() == DiscountType.FIXED) {
-                    userCoupon.useCoupon();
+                if (coupon.getDiscountType() == DiscountType.FIXED) { // 할인 타입이 FIXED일 경우
+                    userCoupon.useCoupon(); // 쿠폰 사용 처리
                     return coupon.getFixedDiscountAmount();
                 } else {// 할인 타입이 PERCENTAGE일 경우
                     int discountAmount = totalProductAmount * coupon.getDiscountPercentage() / 100;
@@ -41,7 +42,7 @@ public class OrderCouponServiceImpl implements OrderCouponService{
                     userCoupon.useCoupon();
                     return discountAmount;
                 }
-            } else { // 최소 주문 금액이 안 될 경우
+            } else { // 최소 주문 금액이 미달일 경우
                 return 0;
             }
         } else { // userCouponId가 null일 경우(쿠폰을 선택하지 않았을 경우)
