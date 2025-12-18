@@ -9,20 +9,23 @@ import kr.kro.moonlightmoist.shopapi.category.domain.QCategory;
 import kr.kro.moonlightmoist.shopapi.product.domain.*;
 import kr.kro.moonlightmoist.shopapi.product.dto.ProductResForList;
 import kr.kro.moonlightmoist.shopapi.product.dto.ProductSearchCondition;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+@Repository
 public class ProductCustomRepositoryImpl implements ProductCustomRepository{
 
     private final JPAQueryFactory queryFactory;
 
-    public ProductCustomRepositoryImpl(EntityManager em) {
+    public ProductCustomRepositoryImpl(@Autowired EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
     }
 
