@@ -12,16 +12,9 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/payments")
-//@CrossOrigin(origins = "*", allowedHeaders = "*",
-//            methods = {
-//                RequestMethod.GET,
-//                    RequestMethod.DELETE,
-//                    RequestMethod.POST,
-//                    RequestMethod.OPTIONS,
-//                    RequestMethod.PUT
-//            })
 public class PaymentController {
     private final PaymentService paymentService;
+
 
     @PostMapping("/verify")
     public ResponseEntity<String> verifyPayment(@RequestBody Map<String, String> requestData) {
@@ -35,6 +28,16 @@ public class PaymentController {
         } catch (Exception e) {
             // 검증 실패 시 400 에러 반환
             return ResponseEntity.status(400).body("결제 검증 실패: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/refund/{orderId}")
+    public ResponseEntity<String> refundPayment(@PathVariable Long orderId, @RequestBody String reason) {
+        try {
+            paymentService.refundOrder(orderId, reason);
+            return ResponseEntity.ok("환불 처리가 완료되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("환불 실패: " + e.getMessage());
         }
     }
 }

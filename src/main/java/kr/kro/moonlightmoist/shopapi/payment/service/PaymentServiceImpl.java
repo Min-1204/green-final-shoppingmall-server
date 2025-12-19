@@ -6,7 +6,10 @@ import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import jakarta.annotation.PostConstruct;
+import kr.kro.moonlightmoist.shopapi.order.domain.Order;
+import kr.kro.moonlightmoist.shopapi.order.repository.OrderRepository;
 import kr.kro.moonlightmoist.shopapi.order.service.OrderService;
+import kr.kro.moonlightmoist.shopapi.pointHistory.service.PointHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +26,10 @@ public class PaymentServiceImpl implements PaymentService {
 
     private IamportClient iamportClient;
 
+    private final OrderRepository orderRepository;
+
     private final OrderService orderService;
+    private final PointHistoryService pointHistoryService;
 
     @Value("${portone.rest-api-key}")
     private String restApiKey;
@@ -87,8 +93,43 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         // E. DB 주문 상태 업데이트 (최종 완료)
-        orderService.completeOrder(merchantUid);
+        orderService.completeOrder(merchantUid, impUid);
 
         log.info("결제 검증 및 주문 완료. 주문번호: {}, imp_uid: {}", merchantUid, impUid);
+    }
+
+    @Override
+    @Transactional
+    public void refundOrder(Long orderId, String reason) throws Exception {
+        Order order = orderRepository.findById(orderId).get();
+
+        // 1. 사전 검증
+        // 예외 발생 시 여기서 중단되므로 포트원 API를 호출하지 않음 (안전)
+        orderService.checkRefundable(order.getOrderNumber(), order.getUser().getId());
+
+        // 2. DB에서 환불에 필요한 imp_uid와 결제 금액 가져오기
+        String impUid = order.getImpUid();
+
+        try {
+            // 3. 포트원 환불 요청
+            CancelData cancelData = new CancelData(impUid, true);  // imp_uid로 취소하는 것이 가장 정확함
+            cancelData.setReason(reason);
+            cancelData.setChecksum(BigDecimal.valueOf(order.getFinalAmount())); // 위변조 방지 : 현재 DB의 잔액을 전달
+
+            IamportResponse<Payment> response = iamportClient.cancelPaymentByImpUid(cancelData);
+
+            if(response.getCode() == 0) {
+                // 환불이 완료되면
+                // 주문 삭제(쿠폰 복구, 주문 쿠폰, 주문, 주문 상품 삭제, 재고 수량 다시 증가)
+                orderService.deleteOneOrder(order.getId());
+                // 포인트 롤백
+                pointHistoryService.rollbackPoint(order.getId());
+            } else {
+                throw new IllegalStateException("PG사 환불 실패: " + response.getMessage());
+            }
+        } catch (Exception e) {
+            log.error("환불 통신 중 오류 발생", e);
+            throw e;
+        }
     }
 }

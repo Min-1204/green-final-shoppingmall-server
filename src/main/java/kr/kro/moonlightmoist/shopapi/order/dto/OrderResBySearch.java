@@ -15,6 +15,7 @@ public class OrderResBySearch {
     private Long id;
     private LocalDate orderDate;
     private String orderNumber;
+    private String impUid;
     @Builder.Default
     private List<OrderProductResBySearch> orderProducts = new ArrayList<>();
     private String receiverName;

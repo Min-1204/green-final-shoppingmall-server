@@ -35,11 +35,11 @@ public class Order extends BaseTimeEntity {
     private User user;
     @Column(unique = true, nullable = false)
     private String orderNumber;
+    // 포트원 시스템에서 생성한 결제 고유 번호
+    @Column(unique = true, nullable = true)
+    private String impUid;
     @Column(nullable = false)
     private String paymentMethod;
-//    @ManyToOne
-//    @JoinColumn(name="delivery_policy_id",nullable = true)
-//    private DeliveryPolicy deliveryPolicy;
     //예상 배송일
     @Column(nullable = false)
     private LocalDate expectedDeliveryDate;
@@ -75,6 +75,10 @@ public class Order extends BaseTimeEntity {
     @Column(nullable = true)
     private String deliveryRequest;
 
+    // 결제한 날짜
+    @Column(nullable = true)
+    private LocalDateTime paidAt;
+
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted;
 
@@ -90,8 +94,15 @@ public class Order extends BaseTimeEntity {
         this.orderCoupon=orderCoupon;
     }
 
+    public void applyImpUid(String impUid) {this.impUid=impUid;}
+
+    public void decidePaidAt(LocalDateTime paidAt) {this.paidAt=paidAt;}
+
     public void deleteOrder() {
         this.deleted=true;
+        for(OrderProduct orderProduct : this.getOrderProducts()) {
+         orderProduct.deleteOrderProduct();
+        }
     }
 
     public OrderResponseDTO toDto() {
@@ -145,6 +156,7 @@ public class Order extends BaseTimeEntity {
                 .id(this.getId())
                 .orderDate(this.getCreatedAt().toLocalDate())
                 .orderNumber(this.getOrderNumber())
+                .impUid(this.getImpUid())
                 .orderProducts(this.getOrderProducts().stream().map(op -> op.toDtoForOrderProductResBySearch()).toList())
                 .receiverName(this.getReceiverName())
                 .ordererName(this.user.getName())

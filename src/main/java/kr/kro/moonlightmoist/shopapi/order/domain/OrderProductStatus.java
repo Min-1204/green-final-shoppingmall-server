@@ -13,9 +13,9 @@ public enum OrderProductStatus {
     DELIVERED,
     // 구매 확정
     CONFIRMED,
-    //반품 신청
+    //반품 신청(배송 후)
     RETURN_REQUESTED,
-    //반품 완료
+    //반품 완료(환불 처리 완료)
     RETURNED
 
 }

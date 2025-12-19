@@ -1,6 +1,7 @@
 package kr.kro.moonlightmoist.shopapi.order.service;
 
 import com.siot.IamportRestClient.response.Payment;
+import jakarta.persistence.EntityNotFoundException;
 import kr.kro.moonlightmoist.shopapi.coupon.domain.Coupon;
 import kr.kro.moonlightmoist.shopapi.coupon.domain.DiscountType;
 import kr.kro.moonlightmoist.shopapi.order.domain.Order;
@@ -35,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +55,7 @@ public class OrderServiceImpl implements OrderService{
     private final OrderCouponRepository orderCouponRepository;
 
     private final OrderCouponService orderCouponService;
+    private final PointHistoryService pointHistoryService;
 
 
     public String createOrderNumber() {
@@ -206,14 +209,18 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public void completeOrder(String merchantUid) {
+    public void completeOrder(String merchantUid, String impUid) {
         // 1. 주문 조회
         Order order = orderRepository.findByMerchantUid(merchantUid).get();
-
-        // 2. 주문 상품들의 상태를 PAID로 변경
+        // 2. 포트원 시스템에서 생성한 결제 고유 번호 저장
+        order.applyImpUid(impUid);
+        // 3. 주문 상품들의 상태를 PAID로 변경
         for(OrderProduct orderProduct : order.getOrderProducts()) {
             orderProduct.updateStatus(OrderProductStatus.PAID);
         }
+
+        // 4. 주문의 결제 날짜 저장
+        order.decidePaidAt(LocalDateTime.now());
 
         log.info("주문 결제 완료 처리. 주문번호: {}", merchantUid);
 
@@ -223,6 +230,8 @@ public class OrderServiceImpl implements OrderService{
     public void deleteOneOrder(Long orderId) {
         log.info("deleteOneOrder 메서드 실행 orderId:{}",orderId);
         Order order = orderRepository.findById(orderId).get();
+
+        // 쿠폰 복구
         OrderCoupon orderCoupon = order.getOrderCoupon();
         if(orderCoupon != null ){
             orderCoupon.getUserCoupon().recoverCoupon();
@@ -290,5 +299,46 @@ public class OrderServiceImpl implements OrderService{
             orderProduct.updateStatus(status);
         }
     }
+
+    @Override
+    public void checkRefundable(String merchantUid, Long currentUserId) {
+        // 1. 주문 존재 여부 확인
+        Order order = orderRepository.findByMerchantUid(merchantUid).orElseThrow(()->new IllegalArgumentException("존재하지 않는 주문입니다."));
+
+        // 2. 권한 확인 (내 주문이 맞는지)
+        if (!order.getUser().getId().equals(currentUserId)) {
+            throw new SecurityException("본인의 주문만 환불 신청이 가능합니다.");
+        }
+
+        // 3. 주문 상태 확인
+        // 결제 완료(PAID) 또는 배송완료(DELIVERED) 상태일 때만 환불 가능. 이미 환불(REFUNDED)되었거나 배송 준비중(PREPARING) 또는 배송중(SHIPPING)이면 불가.
+        OrderProduct orderProduct = order.getOrderProducts().get(0);
+            if(!(orderProduct.getOrderProductStatus() == OrderProductStatus.PAID) && !(orderProduct.getOrderProductStatus() == OrderProductStatus.RETURN_REQUESTED)) {
+                if(orderProduct.getOrderProductStatus() == OrderProductStatus.RETURNED) {
+                    throw new IllegalStateException("이미 환불 처리된 주문입니다.");
+                } else if (orderProduct.getOrderProductStatus() == OrderProductStatus.PREPARING || orderProduct.getOrderProductStatus() == OrderProductStatus.SHIPPING || orderProduct.getOrderProductStatus() == OrderProductStatus.DELIVERED) {
+                    throw new IllegalStateException("배송이 시작된 상품은 고객센터로 문의해주세요.");
+                } else {
+                    throw new IllegalStateException("환불이 불가능한 주문 상태입니다. (상태: " + orderProduct.getOrderProductStatus() + ")");
+                }
+            }
+
+            // 4. 환불 가능 기간 확인
+            if(order.getPaidAt().isBefore(LocalDateTime.now().minusDays(7))) {
+                throw new IllegalStateException("환불 가능 기간(7일)이 지났습니다.");
+            }
+    }
+
+//    @Override
+//    @Transactional
+//    public void completeRefund(String merchantUid) {
+//        Order order = orderRepository.findByMerchantUid(merchantUid).orElseThrow(()->new EntityNotFoundException("주문을 찾을 수 없습니다."));
+//
+//       // 포인트 복구
+//
+//
+//        // 마지막 : 소프트 삭제(주문과 주문 상품)
+//        order.deleteOrder();
+//    }
 
 }
