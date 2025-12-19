@@ -6,15 +6,15 @@ import kr.kro.moonlightmoist.shopapi.review.domain.ReviewComment;
 import kr.kro.moonlightmoist.shopapi.review.dto.ReviewCommentDTO;
 import kr.kro.moonlightmoist.shopapi.review.repository.ReviewCommentRepository;
 import kr.kro.moonlightmoist.shopapi.review.repository.ReviewRepository;
+import kr.kro.moonlightmoist.shopapi.security.CustomUserDetails;
 import kr.kro.moonlightmoist.shopapi.user.domain.User;
 import kr.kro.moonlightmoist.shopapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -29,10 +29,6 @@ public class ReviewCommentServiceImpl implements ReviewCommentService {
     public Review getReview(Long reviewId) {
     return reviewRepository.findById(reviewId).get();
   }
-
-    public User getUser(Long userId) {
-        return userRepository.findById(userId).get();
-    }
 
     @Override
     public List<ReviewCommentDTO> getList(Long reviewId) {
@@ -52,9 +48,20 @@ public class ReviewCommentServiceImpl implements ReviewCommentService {
   }
 
     @Override
-    public Long register(@RequestBody ReviewCommentDTO dto) {
+    public Long register(ReviewCommentDTO dto) {
+
+        //SecurityContext에서 로그인 사용자 가져오기
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof CustomUserDetails)) {
+            throw new RuntimeException("로그인 정보가 올바르지 않습니다.");
+        }
+        String loginId = ((CustomUserDetails) principal).getUsername();
+
+        //loginId로 User 엔티티 조회
+        User user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new RuntimeException("로그인한 사용자를 찾을 수 없습니다."));
+
         Review review = getReview(dto.getReviewId());
-        User user = getUser(dto.getUserId());
 
         ReviewComment reviewComment = ReviewComment.builder()
                 .content(dto.getContent())
@@ -69,11 +76,22 @@ public class ReviewCommentServiceImpl implements ReviewCommentService {
 
     @Override
     public ReviewCommentDTO modify(ReviewCommentDTO dto) {
-        Optional<ReviewComment> reviewCommentId = reviewCommentRepository.findById(dto.getId());
-        ReviewComment reviewComment = reviewCommentId.get();
+        ReviewComment reviewComment = reviewCommentRepository.findById(dto.getId())
+                .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
+
+        //SecurityContext에서 로그인 사용자 가져오기
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof CustomUserDetails)) {
+            throw new RuntimeException("로그인 정보가 올바르지 않습니다.");
+        }
+        String loginId = ((CustomUserDetails) principal).getUsername();
+
+        //loginId로 User 엔티티 조회
+        User user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new RuntimeException("로그인한 사용자를 찾을 수 없습니다."));
 
         //본인 댓글만 수정
-        if (!reviewComment.getUser().getId().equals(dto.getUserId())) {
+        if (!reviewComment.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("본인의 댓글만 수정할 수 있습니다.");
         }
 
@@ -85,12 +103,23 @@ public class ReviewCommentServiceImpl implements ReviewCommentService {
   }
 
     @Override
-    public void remove(Long id, Long userId) {
-        Optional<ReviewComment> reviewCommentId = reviewCommentRepository.findById(id);
-        ReviewComment reviewComment = reviewCommentId.get();
+    public void remove(Long id) {
+        ReviewComment reviewComment = reviewCommentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
+
+        //SecurityContext에서 로그인 사용자 가져오기
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof CustomUserDetails)) {
+            throw new RuntimeException("로그인 정보가 올바르지 않습니다.");
+        }
+        String loginId = ((CustomUserDetails) principal).getUsername();
+
+        //loginId로 User 엔티티 조회
+        User user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new RuntimeException("로그인한 사용자를 찾을 수 없습니다."));
 
         //본인 댓글만 삭제
-        if (!reviewComment.getUser().getId().equals(userId)) {
+        if (!reviewComment.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("본인의 댓글만 삭제할 수 있습니다.");
         }
 

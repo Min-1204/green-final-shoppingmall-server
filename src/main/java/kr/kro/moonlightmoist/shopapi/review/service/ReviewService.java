@@ -10,13 +10,13 @@ public interface ReviewService {
     //상품의 리뷰 전체 조회
     PageResponseDTO<ReviewDTO> getList(Long productId, String sort, PageRequestDTO pageRequestDTO);
     //나의 리뷰 전체 조회(로그인한 유저 본인 리뷰)
-    PageResponseDTO<ReviewDTO> getListByUser(Long userId, PageRequestDTO pageRequestDTO);
+    PageResponseDTO<ReviewDTO> getListByUser(PageRequestDTO pageRequestDTO);
     //리뷰 등록
     Long register(ReviewDTO dto);
     //리뷰 수정
     ReviewDTO modify(ReviewDTO reviewDTO);
     //리뷰 삭제
-    void remove(Long id, Long userId);
+    void remove(Long reviewId);
     //s3 에 업로드한 이미지 url 추가
     void addImageUrls(Long id, ReviewImageUrlDTO dto);
     //별점 평균

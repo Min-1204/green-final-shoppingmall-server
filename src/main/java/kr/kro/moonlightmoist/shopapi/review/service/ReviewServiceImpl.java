@@ -13,6 +13,7 @@ import kr.kro.moonlightmoist.shopapi.review.domain.ReviewImage;
 import kr.kro.moonlightmoist.shopapi.review.dto.ReviewDTO;
 import kr.kro.moonlightmoist.shopapi.review.dto.ReviewImageUrlDTO;
 import kr.kro.moonlightmoist.shopapi.review.repository.ReviewRepository;
+import kr.kro.moonlightmoist.shopapi.security.CustomUserDetails;
 import kr.kro.moonlightmoist.shopapi.user.domain.User;
 import kr.kro.moonlightmoist.shopapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 @Slf4j
@@ -39,11 +41,18 @@ public class ReviewServiceImpl implements ReviewService {
     private final OrderRepository orderRepository;
 
     public Product getProduct(Long productId) {
-      return productRepository.findById(productId).get();
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("해당 상품을 찾을 수 없습니다."));
     }
 
-    public User getUser(Long userId) {
-        return userRepository.findById(userId).get();
+    private User getLoginUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof CustomUserDetails)) {
+            throw new RuntimeException("로그인 정보가 올바르지 않습니다.");
+        }
+        String loginId = ((CustomUserDetails) principal).getUsername();
+        return userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new RuntimeException("로그인한 사용자를 찾을 수 없습니다."));
     }
 
     @Override
@@ -105,14 +114,14 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public PageResponseDTO<ReviewDTO> getListByUser(Long userId, PageRequestDTO pageRequestDTO) {
+    public PageResponseDTO<ReviewDTO> getListByUser(PageRequestDTO pageRequestDTO) {
+        User loginUser = getLoginUser();
 
         int page = pageRequestDTO.getPage() - 1;
         int size = pageRequestDTO.getSize() == null ? 10 : pageRequestDTO.getSize();
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-
-        Page<Review> reviewPage = reviewRepository.findByUserId(userId, pageable);
+        Page<Review> reviewPage = reviewRepository.findByUserId(loginUser.getId(), pageable);
 
         List<ReviewDTO> reviewDTOList = reviewPage.getContent().stream()
             .map(review -> {
@@ -157,11 +166,10 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Long register(ReviewDTO dto) {
-
+        User user = getLoginUser();
         Product product = getProduct(dto.getProductId());
-        User user = getUser(dto.getUserId());
-
-        Order order = orderRepository.findById(dto.getOrderId()).get();
+        Order order = orderRepository.findById(dto.getOrderId())
+                .orElseThrow(() -> new RuntimeException("주문 정보를 찾을 수 없습니다."));
 
         Review review = Review.builder()
                 .user(user)
@@ -178,11 +186,13 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ReviewDTO modify(ReviewDTO reviewDTO) {
-        Optional<Review> foundReviewId = reviewRepository.findById(reviewDTO.getId());
-        Review review = foundReviewId.orElseThrow();
-        
+        Review review = reviewRepository.findById(reviewDTO.getId())
+                .orElseThrow(() -> new RuntimeException("리뷰를 찾을 수 없습니다."));
+
+        User loginUser = getLoginUser();
+
         //본인 리뷰만 수정 가능
-        if (!review.getUser().getId().equals(reviewDTO.getUserId())) {
+        if (!review.getUser().getId().equals(loginUser.getId())) {
             throw new RuntimeException("본인의 리뷰만 수정할 수 있습니다.");
         }
 
@@ -194,8 +204,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         List<String> imageUrls = review.getReviewImages().stream()
-                .map(url -> url.getImageUrl())
-                .toList();
+                .map(url -> url.getImageUrl()).toList();
 
         return ReviewDTO.builder()
                 .content(review.getContent())
@@ -205,12 +214,14 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void remove(Long reviewId, Long userId) {
-        Optional<Review> foundReviewId = reviewRepository.findById(userId);
-        Review review = foundReviewId.orElseThrow();
+    public void remove(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new RuntimeException("리뷰를 찾을 수 없습니다."));
 
-        //본인 리뷰만 삭제 가능
-        if (!review.getUser().getId().equals(userId)) {
+        User loginUser  = getLoginUser();
+
+        //본인 리뷰인지 검증
+        if (!review.getUser().getId().equals(loginUser.getId())) {
             throw new RuntimeException("본인의 리뷰만 삭제할 수 있습니다.");
         }
 
@@ -219,8 +230,8 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void addImageUrls(Long id, ReviewImageUrlDTO dto) {
-
-        Review review = reviewRepository.findById(id).get();
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("리뷰를 찾을 수 없습니다."));
 
         for(String imageUrl : dto.getImageUrls()) {
             ReviewImage reviewImage = ReviewImage.builder()

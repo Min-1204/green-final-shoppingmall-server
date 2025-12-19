@@ -1,7 +1,6 @@
 package kr.kro.moonlightmoist.shopapi.review.controller;
 
 import kr.kro.moonlightmoist.shopapi.review.dto.ReviewCommentDTO;
-import kr.kro.moonlightmoist.shopapi.review.repository.ReviewCommentRepository;
 import kr.kro.moonlightmoist.shopapi.review.service.ReviewCommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/comment")
-//@CrossOrigin(origins = "http://localhost:5173")
 public class ReviewCommentController {
 
     private final ReviewCommentService reviewCommentService;
@@ -32,25 +30,15 @@ public class ReviewCommentController {
     }
 
     @PutMapping("/modify/{commentId}")
-    public ResponseEntity<String> modify(
-        @PathVariable("commentId") Long commentId,
-        @RequestBody ReviewCommentDTO dto,
-        @RequestParam Long userId
-    ) {
-
+    public ResponseEntity<String> modify(@PathVariable("commentId") Long commentId, @RequestBody ReviewCommentDTO dto) {
       dto.setId(commentId);
-      dto.setUserId(userId);
       reviewCommentService.modify(dto);
-
       return ResponseEntity.ok("성공");
     }
 
     @DeleteMapping("/delete/{commentId}")
-    public ResponseEntity<String> remove(
-        @PathVariable("commentId") Long commentId,
-        @RequestParam Long userId
-    ) {
-      reviewCommentService.remove(commentId,userId);
+    public ResponseEntity<String> remove(@PathVariable("commentId") Long commentId) {
+      reviewCommentService.remove(commentId);
       return ResponseEntity.ok("성공");
     }
 }

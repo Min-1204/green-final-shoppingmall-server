@@ -12,6 +12,6 @@ public interface ReviewCommentService {
     //리뷰 댓글 수정
     ReviewCommentDTO modify(ReviewCommentDTO dto);
     //리뷰 댓글 삭제
-    void remove(Long id, Long userId);
+    void remove(Long id);
 
 }

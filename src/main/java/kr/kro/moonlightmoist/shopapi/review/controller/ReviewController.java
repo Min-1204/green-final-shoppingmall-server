@@ -9,6 +9,8 @@ import kr.kro.moonlightmoist.shopapi.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,7 +21,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/review")
-//@CrossOrigin(origins = "http://localhost:5173")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -42,9 +43,9 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user")
     public ResponseEntity<PageResponseDTO<ReviewDTO>> getMyReviews(
-            @PathVariable Long userId,
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
           ) {
@@ -54,7 +55,7 @@ public class ReviewController {
             .size(size)
             .build();
 
-        PageResponseDTO<ReviewDTO> reviews = reviewService.getListByUser(userId, pageRequestDTO);
+        PageResponseDTO<ReviewDTO> reviews = reviewService.getListByUser(pageRequestDTO);
         return ResponseEntity.ok(reviews);
     }
 
@@ -63,6 +64,7 @@ public class ReviewController {
             @RequestPart("review") ReviewDTO dto,
             @RequestPart(value = "reviewImage", required = false) List<MultipartFile> reviewImage
     ){
+
         Long id = reviewService.register(dto);
 
         if (reviewImage != null && !reviewImage.isEmpty()) {
@@ -78,7 +80,7 @@ public class ReviewController {
             reviewService.addImageUrls(id, reviewImageUrlDTO);
         }
 
-        return ResponseEntity.ok("성공");
+        return ResponseEntity.ok("리뷰 등록 성공");
     }
 
     @PutMapping("/modify/{reviewId}")
@@ -103,16 +105,13 @@ public class ReviewController {
             reviewService.addImageUrls(reviewId, reviewImageUrlDTO);
         }
 
-        return ResponseEntity.ok("성공");
+        return ResponseEntity.ok("리뷰 수정 성공");
     }
 
     @DeleteMapping("/delete/{reviewId}")
-    public ResponseEntity<String> remove(
-        @PathVariable("reviewId") Long reviewId,
-        @RequestParam Long userId
-        ) {
-        reviewService.remove(reviewId, userId);
-        return ResponseEntity.ok("성공");
+    public ResponseEntity<String> remove(@PathVariable("reviewId") Long reviewId) {
+        reviewService.remove(reviewId);
+        return ResponseEntity.ok("리뷰 삭제 성공");
     }
 
     @GetMapping("/product/{productId}/avg")
