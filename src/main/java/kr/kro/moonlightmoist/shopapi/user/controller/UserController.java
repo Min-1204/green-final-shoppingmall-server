@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -121,6 +122,7 @@ public class UserController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping("/logout")
     public ResponseEntity<?> logout (HttpServletResponse httpServletResponse) {
 
@@ -142,6 +144,7 @@ public class UserController {
     }
 
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/currentUser")
     public ResponseEntity<Map<String, Object>> currentUser () {
 
@@ -183,6 +186,7 @@ public class UserController {
 
 
     // @RequestParam 방식은 쿼리파라미터를 보내는 방식으로 REST API 원칙과는 다른방식
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/profile/{loginId}")
     public ResponseEntity<UserProfileResponse> getUserProfile (@PathVariable String loginId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -191,6 +195,7 @@ public class UserController {
         return ResponseEntity.ok(profileResponse);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PutMapping("/profile-modify")
     public ResponseEntity<UserModifyResponse> modifyUserProfile (@RequestBody UserModifyRequest userModifyRequest) {
         UserModifyResponse response = userService.modifyUserProfile(userModifyRequest);
@@ -201,6 +206,7 @@ public class UserController {
         }
 
 
+    @PreAuthorize("hasRole('USER')")
     @PatchMapping("/password-change")
     public ResponseEntity<PasswordChangeResponse> changeUserPassword (@RequestBody PasswordChangeRequest request) {
         PasswordChangeResponse response = userService.changeUserPassword(request);
@@ -213,6 +219,7 @@ public class UserController {
     }
 
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/withdraw")
     public ResponseEntity<UserWithdrawalResponse> withdrawUser (@RequestBody UserWithdrawalRequest request) {
         UserWithdrawalResponse response = userWithdrawalService.withdrawUser(request);
