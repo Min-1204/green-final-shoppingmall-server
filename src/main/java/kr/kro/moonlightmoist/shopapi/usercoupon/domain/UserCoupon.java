@@ -36,7 +36,8 @@ public class UserCoupon extends BaseTimeEntity {
     private CouponUsageStatus usageStatus = CouponUsageStatus.ACTIVE;
 
     @Column(nullable = true)
-    private LocalDateTime usedAt;
+    @Builder.Default
+    private LocalDateTime usedAt = null;
 
     @Column(name = "is_deleted", nullable = false)
     @Builder.Default

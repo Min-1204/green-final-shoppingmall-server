@@ -40,4 +40,14 @@ public class UserCouponController {
         System.out.println("userCoupons = " + userCoupons);
         return ResponseEntity.ok(userCoupons);
     }
+
+    @PostMapping("/code")
+    public ResponseEntity<String> issueCouponByCode(@RequestBody CouponIssueReq dto) {
+        System.out.println("userId = " + dto.getUserId());
+        System.out.println("couponCode = " + dto.getCouponCode());
+
+        userCouponService.issueCouponByCode(dto.getUserId(), dto.getCouponCode());
+        return ResponseEntity.ok("ok");
+    }
+
 }

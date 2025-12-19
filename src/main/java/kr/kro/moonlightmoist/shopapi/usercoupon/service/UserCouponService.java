@@ -8,4 +8,5 @@ public interface UserCouponService {
     Long issue(Long userId, Long couponId);
     List<UserCouponRes> getUserCouponsByUserId(Long userId);
     void useCoupon(Long userId, Long couponId);
+    void issueCouponByCode(Long userId, String code);
 }

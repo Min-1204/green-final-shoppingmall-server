@@ -11,4 +11,5 @@ import lombok.*;
 public class CouponIssueReq {
     private Long userId;
     private Long couponId;
+    private String couponCode;
 }
