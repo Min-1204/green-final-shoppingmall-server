@@ -29,10 +29,16 @@ public class ProductController {
     @PostMapping("")
     public ResponseEntity<String> productRegister(
             @RequestPart("product") ProductRequest product,
-            @RequestPart("optionImages") List<MultipartFile> optionImages,
+            @RequestPart(value = "optionImages", required = false) List<MultipartFile> optionImages,
             @RequestPart("mainImages") List<MultipartFile> mainImages,
-            @RequestPart("detailImages") List<MultipartFile> detailImages
+            @RequestPart(value = "detailImages", required = false) List<MultipartFile> detailImages
             ) {
+        if (optionImages == null) {
+            optionImages = new ArrayList<>();
+        }
+        if (detailImages == null) {
+            detailImages = new ArrayList<>();
+        }
 
         System.out.println("product = " + product);
 
@@ -66,10 +72,6 @@ public class ProductController {
         }
 
         productService.addImageUrls(id, urlDTO);
-
-
-//        Long id = productService.register(request);
-//        System.out.println("id = " + id);
 
         return ResponseEntity.ok("ok");
     }
