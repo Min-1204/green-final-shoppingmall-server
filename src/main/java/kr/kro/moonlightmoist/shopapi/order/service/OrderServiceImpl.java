@@ -168,40 +168,40 @@ public class OrderServiceImpl implements OrderService{
         return orderResponseDTO;
     }
 
-    @Override
-    public PageResponseDTO<OrderResponseDTO> getOrderList(Long userId, String sort, PageRequestDTO pageRequestDTO) {
-        // 1. Pageable 객체 생성 및 정렬 적용 (요청된 페이징 및 정렬 정보를 DB 쿼리에 전달)
-        int page = pageRequestDTO.getPage() - 1; // 페이지 번호 (0부터 시작)
-        int size = pageRequestDTO.getSize() == null ? 10 : pageRequestDTO.getSize();
-
-        // Sort 객체 생성 및 요청된 sort 값에 따라 업데이트
-        Sort sortBy = Sort.by("createdAt").descending(); // 기본 정렬 : 최신순
-
-        if ("latest".equals(sort)) {
-            sortBy = Sort.by("createdAt").descending();
-        }
-        else if("earliest".equals(sort)) {
-            sortBy = Sort.by("createdAt").ascending();
-        }
-
-        // Pageable 객체 생성
-        Pageable pageable = PageRequest.of(page, size, sortBy);
-
-        // 2. DB에서 요청된 페이지의 데이터만 Page<Order>로 조회
-        Page<Order> orderPage = orderRepository.findByUserId(userId, pageable);
-
-        // 3. Page<Order> 데이터를 List<OrderResponseDTO>로 매핑
-        List<OrderResponseDTO> ListOfOrderResponseDTO = orderPage.getContent().stream()
-                .map(o->o.toDto()) // toDto 메서드를 사용하여 Order -> OrderResponseDTO 변환
-                .toList();
-
-        // 4. PageResponseDTO 반환
-        return PageResponseDTO.<OrderResponseDTO>withAll()
-                .dtoList(ListOfOrderResponseDTO) // 현재 페이지의 DTO 리스트
-                .pageRequestDTO(pageRequestDTO)
-                .totalDataCount(orderPage.getTotalElements()) // DB에서 계산된 전체 항목 수
-                .build();
-    }
+//    @Override
+//    public PageResponseDTO<OrderResponseDTO> getOrderList(Long userId, String sort, PageRequestDTO pageRequestDTO) {
+//        // 1. Pageable 객체 생성 및 정렬 적용 (요청된 페이징 및 정렬 정보를 DB 쿼리에 전달)
+//        int page = pageRequestDTO.getPage() - 1; // 페이지 번호 (0부터 시작)
+//        int size = pageRequestDTO.getSize() == null ? 10 : pageRequestDTO.getSize();
+//
+//        // Sort 객체 생성 및 요청된 sort 값에 따라 업데이트
+//        Sort sortBy = Sort.by("createdAt").descending(); // 기본 정렬 : 최신순
+//
+//        if ("latest".equals(sort)) {
+//            sortBy = Sort.by("createdAt").descending();
+//        }
+//        else if("earliest".equals(sort)) {
+//            sortBy = Sort.by("createdAt").ascending();
+//        }
+//
+//        // Pageable 객체 생성
+//        Pageable pageable = PageRequest.of(page, size, sortBy);
+//
+//        // 2. DB에서 요청된 페이지의 데이터만 Page<Order>로 조회
+//        Page<Order> orderPage = orderRepository.findByUserId(userId, pageable);
+//
+//        // 3. Page<Order> 데이터를 List<OrderResponseDTO>로 매핑
+//        List<OrderResponseDTO> ListOfOrderResponseDTO = orderPage.getContent().stream()
+//                .map(o->o.toDto()) // toDto 메서드를 사용하여 Order -> OrderResponseDTO 변환
+//                .toList();
+//
+//        // 4. PageResponseDTO 반환
+//        return PageResponseDTO.<OrderResponseDTO>withAll()
+//                .dtoList(ListOfOrderResponseDTO) // 현재 페이지의 DTO 리스트
+//                .pageRequestDTO(pageRequestDTO)
+//                .totalDataCount(orderPage.getTotalElements()) // DB에서 계산된 전체 항목 수
+//                .build();
+//    }
 
     @Override
     public BigDecimal getExpectedAmount(String merchantUid) {

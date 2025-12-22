@@ -41,19 +41,19 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOneOrder(orderId));
     }
 
-    @GetMapping("/list/{userId}")
-    public ResponseEntity<PageResponseDTO<OrderResponseDTO>> getOrderList(
-            @PathVariable Long userId,
-            @RequestParam(defaultValue = "latest") String sort, // 기본 최신순
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
-                .page(page)
-                .size(size)
-                .build();
-        return ResponseEntity.ok(orderService.getOrderList(userId, sort, pageRequestDTO));
-    }
+//    @GetMapping("/list/{userId}")
+//    public ResponseEntity<PageResponseDTO<OrderResponseDTO>> getOrderList(
+//            @PathVariable Long userId,
+//            @RequestParam(defaultValue = "latest") String sort, // 기본 최신순
+//            @RequestParam(defaultValue = "1") int page,
+//            @RequestParam(defaultValue = "10") int size
+//    ) {
+//        PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
+//                .page(page)
+//                .size(size)
+//                .build();
+//        return ResponseEntity.ok(orderService.getOrderList(userId, sort, pageRequestDTO));
+//    }
 
     @DeleteMapping("")
     public ResponseEntity<String> deleteOneOrder(@RequestParam Long orderId) {

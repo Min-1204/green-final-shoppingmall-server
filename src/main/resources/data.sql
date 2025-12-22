@@ -4438,50 +4438,21 @@ VALUES
 (4, 4, 'ACTIVE', NULL, FALSE, NOW(), NOW());
 
 
--- 민석 carts 테이블 데이터(임시)
-INSERT INTO carts (id, user_id, created_at, updated_at)
-VALUES
-(1, 1, NOW(), NOW()),
-(2, 2, NOW(), NOW()),
-(3, 3, NOW(), NOW()),
-(4, 4, NOW(), NOW()),
-(5, 5, NOW(), NOW());
-
--- 민석 cart_products 테이블 데이터
-INSERT INTO cart_products (id, cart_id, product_option_id, quantity, added_at, updated_at)
-VALUES
-(1, 1, 1, 5, NOW(), NOW()),
-(2, 1, 2, 5, NOW(), NOW()),
-(3, 1, 3, 5, NOW(), NOW());
-
--- 민석 user_addresses 테이블 데이터
-INSERT INTO user_addresses
-(id, user_id, address_name, receiver_name, receiver_phone, postal_code,
- street_address, detailed_address, is_default, delivery_request,
- created_at, updated_at)
-VALUES
--- 기본 주소
-(1, 1, '집', '강민석', '01012345678', '06236',
- '서울특별시 강남구 테헤란로 123', '101동 1203호',
- TRUE, '문 앞에 놓아주세요.', NOW(), NOW()),
-
--- 일반 주소
-(2, 1, '회사', '강민석', '01012345678', '04524',
- '서울특별시 중구 세종대로 110', '20층',
- FALSE, '경비실에 맡겨주세요.', NOW(), NOW()),
-
-(3, 2, '집', '홍길동', '01098765432', '07941',
- '서울특별시 양천구 목동로 210', '302동 502호',
- TRUE, NULL, NOW(), NOW()),
-
-(4, 2, '부모님 댁', '홍길동', '01098765432', '16888',
- '경기도 성남시 분당구 정자동 123', NULL,
- FALSE, '도착 전 연락 부탁드립니다.', NOW(), NOW()),
-
-(5, 1, '기타 배송지', '강민석', '01012345678', '12345',
- '서울특별시 마포구 월드컵북로 400', '3층',
- FALSE, NULL, NOW(), NOW());
-
+---- 민석 carts 테이블 데이터(임시)
+--INSERT INTO carts (id, user_id, created_at, updated_at)
+--VALUES
+--(1, 1, NOW(), NOW()),
+--(2, 2, NOW(), NOW()),
+--(3, 3, NOW(), NOW()),
+--(4, 4, NOW(), NOW()),
+--(5, 5, NOW(), NOW());
+--
+---- 민석 cart_products 테이블 데이터
+--INSERT INTO cart_products (id, cart_id, product_option_id, quantity, added_at, updated_at)
+--VALUES
+--(1, 1, 1, 5, NOW(), NOW()),
+--(2, 1, 2, 5, NOW(), NOW()),
+--(3, 1, 3, 5, NOW(), NOW());
 
 -- 민석 order 테이블 더미 데이터 (총 100개)
 INSERT INTO orders
