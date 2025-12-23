@@ -3,6 +3,7 @@ package kr.kro.moonlightmoist.shopapi.user.controller;
 import kr.kro.moonlightmoist.shopapi.review.dto.PageRequestDTO;
 import kr.kro.moonlightmoist.shopapi.review.dto.PageResponseDTO;
 import kr.kro.moonlightmoist.shopapi.user.domain.User;
+import kr.kro.moonlightmoist.shopapi.user.domain.UserRole;
 import kr.kro.moonlightmoist.shopapi.user.dto.UserSearchCondition;
 import kr.kro.moonlightmoist.shopapi.user.service.UserAdminService;
 import kr.kro.moonlightmoist.shopapi.user.service.UserService;
@@ -41,5 +42,13 @@ public class UserAdminController {
 
         log.info("검색 결과: 총 {}명, 현재 페이지 {}개", result.getTotalDataCount(), result.getDtoList().size());
         return ResponseEntity.ok(result);
+    }
+
+    @PatchMapping("/{userId}/role")
+    public void changeUserRole(
+            @PathVariable Long userId,
+            @RequestParam UserRole userRole
+    ) {
+        userAdminService.userRoleChange(userId, userRole);
     }
 }

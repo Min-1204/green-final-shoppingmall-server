@@ -1,8 +1,11 @@
 package kr.kro.moonlightmoist.shopapi.user.service;
 
+import jakarta.transaction.Transactional;
 import kr.kro.moonlightmoist.shopapi.review.dto.PageRequestDTO;
 import kr.kro.moonlightmoist.shopapi.review.dto.PageResponseDTO;
+import kr.kro.moonlightmoist.shopapi.user.useradminexception.UserNotFoundException;
 import kr.kro.moonlightmoist.shopapi.user.domain.User;
+import kr.kro.moonlightmoist.shopapi.user.domain.UserRole;
 import kr.kro.moonlightmoist.shopapi.user.dto.UserSearchCondition;
 import kr.kro.moonlightmoist.shopapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,11 +15,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class UserAdminServiceImpl implements UserAdminService{
 
     private final UserRepository userRepository;
@@ -38,5 +40,13 @@ public class UserAdminServiceImpl implements UserAdminService{
                 .build();
 
         return pageResponseDTO;
+    }
+
+    @Override
+    public void userRoleChange(Long userId, UserRole userRole) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        user.changeRole(userRole);
     }
 }

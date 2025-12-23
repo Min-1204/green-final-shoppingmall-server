@@ -130,6 +130,13 @@ public class User extends BaseTimeEntity {
         // 암호화 필드저장
     }
 
+    // 회원 권한 변경
+    public void changeRole(UserRole newRole) {
+        if (newRole == null) {
+            throw new IllegalArgumentException("role must not be null");
+        }
+        this.userRole = newRole;
+    }
 
 
 
