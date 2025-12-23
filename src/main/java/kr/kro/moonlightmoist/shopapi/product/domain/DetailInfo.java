@@ -22,7 +22,7 @@ public class DetailInfo extends BaseTimeEntity {
     private String usagePeriod;
     @Lob
     private String usageMethod;
-    @Column(length = 300)
+    @Column(length = 500)
     private String manufacturer;
     private String madeInCountry;
     @Lob
@@ -30,7 +30,7 @@ public class DetailInfo extends BaseTimeEntity {
     private String functionalCertification;
     @Lob
     private String caution;
-    @Column(length = 300)
+    @Column(length = 1000)
     private String qualityGuarantee;
     private String customerServiceNumber;
 
