@@ -108,4 +108,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // 상속
         return null;
     }
 
+    //스웨거 문서 관련 요청에 JWT 필터가 타지 않도록 막는 역할
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request){
+        String path = request.getRequestURI();
+
+        return path.startsWith("/swagger-ui")
+                || path.startsWith("/v3/api-docs");
+    }
+
 }
