@@ -30,16 +30,14 @@ public class OrderCouponServiceImpl implements OrderCouponService{
             Coupon coupon = userCoupon.getCoupon();
             // 최소 주문 금액 제한이 없거나 최소 주문 금액보다 더 많이 주문했을때
             if (!coupon.getLimitMinOrderAmount() || (coupon.getLimitMinOrderAmount() && (totalProductAmount >= coupon.getMinOrderAmount()))) {
+                userCoupon.useCoupon(); // 쿠폰 사용 처리
                 if (coupon.getDiscountType() == DiscountType.FIXED) { // 할인 타입이 FIXED일 경우
-                    userCoupon.useCoupon(); // 쿠폰 사용 처리
                     return coupon.getFixedDiscountAmount();
                 } else {// 할인 타입이 PERCENTAGE일 경우
                     int discountAmount = totalProductAmount * coupon.getDiscountPercentage() / 100;
                     if (discountAmount > coupon.getMaxDiscountAmount()) {
-                        userCoupon.useCoupon();
                         return coupon.getMaxDiscountAmount();
                     }
-                    userCoupon.useCoupon();
                     return discountAmount;
                 }
             } else { // 최소 주문 금액이 미달일 경우
