@@ -50,6 +50,7 @@ public class UserCoupon extends BaseTimeEntity {
 
     public void recoverCoupon() {
         this.usageStatus = CouponUsageStatus.ACTIVE;
+        this.usedAt = null;
     }
 
     public UserCouponRes toDto() {
