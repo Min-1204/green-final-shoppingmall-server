@@ -16,15 +16,20 @@ public class ReviewDTO {
     private Long id;
     private String content;
     private int rating;
+
     private Long userId;
     private String loginId;
+    private Long orderProductId;
     private Long productId;
-    private Long orderId;
+
+    private String optionName;
     private String productImage;
     private String productName;
     private String brandName;
+
     private LocalDateTime createdAt;
     private LocalDateTime purchaseDate;
+
     private boolean deleted; //삭제 상태 표시용
     private boolean visible; //관리자 삭제 상태 표시용
     @Builder.Default
