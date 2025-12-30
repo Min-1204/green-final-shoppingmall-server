@@ -270,7 +270,8 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Double getAvgRating(Long productId) {
-        return reviewRepository.reviewAvgRating(productId);
+        Double avg = reviewRepository.reviewAvgRating(productId);
+        return avg!= null ? avg : 0.0;
     }
 
     @Override
