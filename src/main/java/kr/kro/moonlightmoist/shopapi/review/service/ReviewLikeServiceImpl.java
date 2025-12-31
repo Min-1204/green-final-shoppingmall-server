@@ -43,6 +43,11 @@ public class ReviewLikeServiceImpl implements ReviewLikeService{
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewLikeException("리뷰를 찾을 수 없습니다."));
 
+        //본인 리뷰 좋아요 차단
+        if (review.getUser().getId().equals(user.getId())) {
+            throw new ReviewLikeException("본인 리뷰에는 좋아요를 누를 수 없습니다.");
+        }
+
         //좋아요(도움이 돼요)가 존재하는지 확인
         Optional<ReviewLike> reviewLike = reviewLikeRepository.findByReviewAndUser(review, user);
 
