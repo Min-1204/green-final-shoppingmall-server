@@ -7,6 +7,7 @@ import kr.kro.moonlightmoist.shopapi.helpcenter.domain.Faq;
 import kr.kro.moonlightmoist.shopapi.helpcenter.domain.InquiryType;
 import kr.kro.moonlightmoist.shopapi.order.domain.Order;
 import kr.kro.moonlightmoist.shopapi.order.domain.OrderProduct;
+import kr.kro.moonlightmoist.shopapi.order.domain.OrderProductStatus;
 import kr.kro.moonlightmoist.shopapi.policy.deliveryPolicy.domain.DeliveryPolicy;
 import kr.kro.moonlightmoist.shopapi.policy.deliveryPolicy.domain.DeliveryPolicyType;
 import kr.kro.moonlightmoist.shopapi.product.domain.*;
@@ -155,6 +156,17 @@ public class EntityFactory {
                 .build();
     }
 
+    public static OrderProduct createOrderProduct(Order order, ProductOption productOption){
+        return OrderProduct.builder()
+                .order(order)
+                .productOption(productOption)
+                .quantity(5)
+                .purchasedPrice(1000)
+                .orderProductStatus(OrderProductStatus.PAID)
+                .deleted(false)
+                .build();
+    }
+
     public static Review createReview(User user, Product product){
         return Review.builder()
                 .user(user)
@@ -162,7 +174,6 @@ public class EntityFactory {
                 .rating(5)
                 .visible(true)
                 .deleted(false)
-                .product(product)
                 .build();
     }
 

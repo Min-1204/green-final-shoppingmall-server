@@ -5,7 +5,13 @@ import kr.kro.moonlightmoist.shopapi.brand.domain.Brand;
 import kr.kro.moonlightmoist.shopapi.brand.repository.BrandRepository;
 import kr.kro.moonlightmoist.shopapi.category.domain.Category;
 import kr.kro.moonlightmoist.shopapi.category.repository.CategoryRepository;
+import kr.kro.moonlightmoist.shopapi.order.domain.Order;
+import kr.kro.moonlightmoist.shopapi.order.domain.OrderProduct;
+import kr.kro.moonlightmoist.shopapi.order.repository.OrderProductRepository;
+import kr.kro.moonlightmoist.shopapi.order.repository.OrderRepository;
 import kr.kro.moonlightmoist.shopapi.product.domain.Product;
+import kr.kro.moonlightmoist.shopapi.product.domain.ProductOption;
+import kr.kro.moonlightmoist.shopapi.product.repository.ProductOptionRepository;
 import kr.kro.moonlightmoist.shopapi.product.repository.ProductRepository;
 import kr.kro.moonlightmoist.shopapi.review.domain.Review;
 import kr.kro.moonlightmoist.shopapi.review.domain.ReviewComment;
@@ -32,13 +38,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ReviewRepositoryUnitTest {
 
     @Autowired
+    OrderProductRepository orderProductRepository;
+
+    @Autowired
     ProductRepository productRepository;
 
     @Autowired
-    CategoryRepository categoryRepository;
+    OrderRepository orderRepository;
+
+    @Autowired
+    ProductOptionRepository productOptionRepository;
 
     @Autowired
     BrandRepository brandRepository;
+
+    @Autowired
+    CategoryRepository categoryRepository;
 
     @Autowired
     ReviewRepository reviewRepository;
@@ -58,6 +73,9 @@ public class ReviewRepositoryUnitTest {
     private Brand brand;
     private Category category;
     private Product product;
+    private Order order;
+    private ProductOption productOption;
+    private OrderProduct orderProduct;
     private ReviewComment reviewComment;
     private ReviewLike reviewLike;
     private Review review;
@@ -65,10 +83,14 @@ public class ReviewRepositoryUnitTest {
 
     @BeforeEach
     public void init() {
-        brand = brandRepository.save(EntityFactory.createBrand("브랜드"));
-        category = categoryRepository.save(EntityFactory.createCategory("카테고리",0,0));
-        product = productRepository.save(EntityFactory.createProduct(category, brand));
+
         user = userRepository.save(EntityFactory.createUser());
+        brand = brandRepository.save(EntityFactory.createBrand("토니모리"));
+        category = categoryRepository.save(EntityFactory.createCategory("스킨케어", 1, 2));
+        product = productRepository.save(EntityFactory.createProduct(category, brand));
+        order = orderRepository.save(EntityFactory.createOrder(user));
+        productOption = productOptionRepository.save(EntityFactory.createProductOption("옵션1", product));
+        orderProduct = orderProductRepository.save(EntityFactory.createOrderProduct(order, productOption));
 
         review = Review.builder()
                 .user(user)
@@ -76,7 +98,7 @@ public class ReviewRepositoryUnitTest {
                 .rating(5)
                 .visible(true)
                 .deleted(false)
-                .product(product)
+                .orderProduct(orderProduct)
                 .build();
         review = reviewRepository.save(review);
         reviewComment = reviewCommentRepository.save(EntityFactory.createReviewComment(review));
@@ -84,45 +106,44 @@ public class ReviewRepositoryUnitTest {
     }
 
 
-//    @Test
-//    @DisplayName("리뷰 이미지 조회 테스트")
-//    public void addTest(){
-//        ReviewImage reviewImage = ReviewImage.builder()
-//                .imageUrl("https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/550/10/0000/0020/A00000020064655ko.jpg?l=ko")
-//                .build();
-//
-//        review.addImage(reviewImage);
-//        reviewRepository.flush();
-//        em.clear();
-//
-//        Optional<Review> foundReview = reviewRepository.findById(review.getId());
-//
-//        assertThat(foundReview).isPresent();
-//        assertThat(foundReview.get().getId()).isNotNull();
-//        assertThat(foundReview.get().getUser()).isNotNull();
-//        assertThat(foundReview.get().getContent()).isEqualTo("리뷰내용1");
-//        assertThat(foundReview.get().getRating()).isEqualTo(5);
-//        assertThat(foundReview.get().getReviewImages().size()).isEqualTo(1);
-//        assertThat(foundReview.get().getReviewImages().get(0).getImageUrl()).isEqualTo("https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/550/10/0000/0020/A00000020064655ko.jpg?l=ko");
-//        assertThat(foundReview.get().getReviewImages().get(0).getImageOrder()).isEqualTo(0);
-//        assertThat(foundReview.get().isVisible()).isTrue();
-//        assertThat(foundReview.get().isDeleted()).isFalse();
-//        assertThat(foundReview.get().getProduct()).isNotNull();
-//        assertThat(foundReview.get().getProduct().getId()).isEqualTo(product.getId());
-//
-//        assertThat(reviewComment.getId()).isNotNull();
-//        assertThat(reviewComment.getContent()).isEqualTo("리뷰댓글");
-//        assertThat(reviewComment.isVisible()).isTrue();
-//        assertThat(reviewComment.isDeleted()).isFalse();
-//        assertThat(reviewComment.getReview()).isNotNull();
-//        assertThat(reviewComment.getReview().getId()).isEqualTo(foundReview.get().getId());
-//
-//        assertThat(reviewLike.getId()).isNotNull();
-//        assertThat(reviewLike.isDeleted()).isFalse();
-//        assertThat(reviewLike.getReview()).isNotNull();
-//        assertThat(reviewLike.getReview().getId()).isEqualTo(foundReview.get().getId());
-//
-//
-//    }
+    @Test
+    @DisplayName("리뷰 이미지 조회 테스트")
+    public void addTest(){
+        ReviewImage reviewImage = ReviewImage.builder()
+                .imageUrl("https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/550/10/0000/0020/A00000020064655ko.jpg?l=ko")
+                .build();
+
+        review.addImage(reviewImage);
+        reviewRepository.flush();
+        em.clear();
+
+        Optional<Review> foundReview = reviewRepository.findById(review.getId());
+
+        assertThat(foundReview).isPresent();
+        assertThat(foundReview.get().getId()).isNotNull();
+        assertThat(foundReview.get().getUser()).isNotNull();
+        assertThat(foundReview.get().getContent()).isEqualTo("리뷰내용1");
+        assertThat(foundReview.get().getRating()).isEqualTo(5);
+        assertThat(foundReview.get().getReviewImages().size()).isEqualTo(1);
+        assertThat(foundReview.get().getReviewImages().get(0).getImageUrl()).isEqualTo("https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/550/10/0000/0020/A00000020064655ko.jpg?l=ko");
+        assertThat(foundReview.get().getReviewImages().get(0).getImageOrder()).isEqualTo(0);
+        assertThat(foundReview.get().isVisible()).isTrue();
+        assertThat(foundReview.get().isDeleted()).isFalse();
+        assertThat(foundReview.get().getOrderProduct()).isNotNull();
+        assertThat(foundReview.get().getOrderProduct().getId()).isEqualTo(product.getId());
+
+        assertThat(reviewComment.getId()).isNotNull();
+        assertThat(reviewComment.getContent()).isEqualTo("리뷰댓글");
+        assertThat(reviewComment.isVisible()).isTrue();
+        assertThat(reviewComment.isDeleted()).isFalse();
+        assertThat(reviewComment.getReview()).isNotNull();
+        assertThat(reviewComment.getReview().getId()).isEqualTo(foundReview.get().getId());
+
+        assertThat(reviewLike.getId()).isNotNull();
+        assertThat(reviewLike.isDeleted()).isFalse();
+        assertThat(reviewLike.getReview()).isNotNull();
+        assertThat(reviewLike.getReview().getId()).isEqualTo(foundReview.get().getId());
+        
+    }
 
 }
