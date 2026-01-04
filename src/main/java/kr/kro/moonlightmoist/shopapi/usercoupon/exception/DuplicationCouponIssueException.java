@@ -5,6 +5,6 @@ import org.springframework.http.HttpStatus;
 
 public class DuplicationCouponIssueException extends BusinessException {
     public DuplicationCouponIssueException() {
-        super(HttpStatus.BAD_REQUEST, "이미 발급받은 쿠폰입니다.");
+        super(HttpStatus.CONFLICT, "이미 발급받은 쿠폰입니다.");
     }
 }

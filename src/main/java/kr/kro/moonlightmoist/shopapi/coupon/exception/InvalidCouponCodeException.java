@@ -5,6 +5,6 @@ import org.springframework.http.HttpStatus;
 
 public class InvalidCouponCodeException extends BusinessException {
     public InvalidCouponCodeException() {
-        super(HttpStatus.BAD_REQUEST, "잘못된 쿠폰 코드입니다.");
+        super(HttpStatus.NOT_FOUND, "잘못된 쿠폰 코드입니다.");
     }
 }
