@@ -64,14 +64,14 @@ public class JwtTokenProvider {
 
         CustomUserDetails userDetails  = (CustomUserDetails) authentication.getPrincipal();
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + refreshTokenValidityInMilliseconds); // 1일
+        Date expiryDate = new Date(now.getTime() + refreshTokenValidityInMilliseconds); // 7일
 
         return Jwts.builder()
-                .subject(userDetails.getUser().getLoginId()) // 로그인한 사용자
-                .claim("userId",userDetails.getUser().getId()) // 로그인한 사용자의 id (pk)
-                .issuedAt(now) // 생성 시간
-                .expiration(expiryDate) // 유효 시간
-                .signWith(getSigningKey()) // 키 검증
+                .subject(userDetails.getUser().getLoginId())
+                .claim("userId",userDetails.getUser().getId())
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(getSigningKey())
                 .compact();
     }
 

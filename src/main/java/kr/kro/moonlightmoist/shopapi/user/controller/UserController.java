@@ -106,10 +106,6 @@ public class UserController {
                                                       HttpServletResponse httpServletResponse) {
         log.info("로그인 요청 : {}", userLoginRequest.getLoginId());
 
-//        Authentication은 스프링 시큐리티에서 **'인증(Authentication)에 대한 모든 정보'**를 담는 최상위 개념의 인터페이스
-//        authenticate( 인증을 시작하는 핵심 메서드 ) 인증요청 객체를 받아서 해당 요청이 유효한지 확인하고 인증된 객체를 반환해준다.
-//        인터페이스는 두 가지 상태를 표현하기 위해 사용된다. 1. 인증요청 2. 인증완료
-
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -117,29 +113,29 @@ public class UserController {
                             userLoginRequest.getPassword()
                     )
             );
+//            DaoAuthenticationProvider가 CustomUserDetailsService의 loadUserByUsername을 실행
+//            DB에서 사용자를 조회하면서 User를 반환하는데 해당 암호화된 비밀번호를
+//            DaoAuthenticationProvider의 내부로직에서 PasswordEncoder를 사용해 검증을 합니다.
+//            검증이 끝나면 authentication 객체를 반환합니다.
 
 //        SecurityContext에 저장하기.
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            String accessToken = jwtTokenProvider.generateAccessToken(authentication); // 사용자정보로 엑세스토큰 생성
-            String refreshToken = jwtTokenProvider.generateRefreshToken(authentication); // 사용자정보로 리프레시토큰 생성
-
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            // 해당 정보의 사용자정보를 다운캐스팅해서 꺼냄 *Principal의 경우 일반적으로 Object 타입
-
-            log.info("로그인 성공 로그인아이디: {}, JWT 생성 및 발급 완료", userDetails.getUser().getLoginId());
+            String accessToken = jwtTokenProvider.generateAccessToken(authentication);
+            String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
 
             // 쿠키 설정 (ResponseCookie 사용)
             setTokenCookies(httpServletResponse, accessToken, refreshToken);
 
-            // 기존에 있던 Token 삭제. 
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            log.info("로그인 성공 로그인아이디: {}, JWT 생성 및 발급 완료", userDetails.getUser().getLoginId());
+
             refreshTokenRepository.deleteByUserId(userDetails.getUser().getId());
 
-            // 방금 생성한 토큰 저장
             refreshTokenRepository.save(new RefreshToken(
                     userDetails.getUser().getId(),
                     refreshToken,
-                    LocalDateTime.now().plusDays(1)
+                    LocalDateTime.now().plusDays(7)
             ));
 
             int activePoint = pointHistoryService.getActivePoint(userDetails.getUser().getId());
@@ -179,7 +175,7 @@ public class UserController {
             log.info("토큰 갱신 요청");
 
 
-            // 리퀘스트에서 쿠키의 토큰을 추출duf
+            // request에서 쿠키의 토큰을 추출
             String refreshToken = getRefreshTokenFromCookie(request);
 
             // 추출한 토큰이 없다면 예외
@@ -222,7 +218,7 @@ public class UserController {
             refreshTokenRepository.save(new RefreshToken(
                     findUser.getId(),
                     newRefreshToken,
-                    LocalDateTime.now().plusDays(1)
+                    LocalDateTime.now().plusDays(7)
             ));
 
             // 새 토큰을 쿠키에 설정
@@ -357,7 +353,6 @@ public class UserController {
 
 
     private void setTokenCookies(HttpServletResponse response, String accessToken, String refreshToken) {
-        // 배포 환경에서는 secure(true), sameSite("None") 필수
         ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
                 .path("/")
                 .httpOnly(true)
@@ -371,7 +366,7 @@ public class UserController {
                 .httpOnly(true)
                 .secure(true) // HTTPS 필수
                 .sameSite("None")
-                .maxAge(60 * 60 * 24)
+                .maxAge(60 * 60 * 24 * 7)
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
