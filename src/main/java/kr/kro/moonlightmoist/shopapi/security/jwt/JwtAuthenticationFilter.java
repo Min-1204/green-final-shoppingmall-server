@@ -39,20 +39,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // 상속
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        try { // 인가를 할때 문제가 발생할 수 있기때문에 try-catch 사용
+        try {
             // 요청 헤더에서 토큰 추출
             String jwt = getJwtFromRequest(request); // 쿠키만 추출하는 함수
 
             // 검증
             if(StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
-                // jwt에
                 // 토큰에서 로그인아이디 추출
-                String loginId = jwtTokenProvider.getLoginIdFromToken(jwt); // 로그인아이디를 꺼내오는 함수 실행
+                String loginId = jwtTokenProvider.getLoginIdFromToken(jwt);
                 log.info("여기는 필터체인 토큰의 로그인 아이디 추출 : {}", loginId);
 
                 // DB에서 사용자 정보 조회
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(loginId);
-                // loginId로 DB에서 사용자를 찾아서 반환하는 타입을 UserDetails로 변환 *UserDetailService의 오버라이드 기능.
                 log.info("여기는 필터체인 DB에서 사용자정보 추출 : {}", userDetails);
 
                 // Authentication 객체 생성
@@ -63,7 +61,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // 상속
                                 null, // 인증정보
                                 userDetails.getAuthorities() // 권한정보
                         );
-
                 // 요청정보를 Authentication에 추가해야한다.
                 authentication.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
@@ -73,9 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // 상속
 
 //                SecurityContextHolder에 저장
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-
                 log.info("JWT 인증 성공 => 로그인아이디 : {}", loginId);
-
             }
         } catch(InvalidTokenException e) {
             log.error("JWT 인증 처리 중 오류 발생 :{} ", e.getMessage());
