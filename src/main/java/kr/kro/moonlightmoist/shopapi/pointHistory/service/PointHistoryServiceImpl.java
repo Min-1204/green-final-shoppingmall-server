@@ -6,6 +6,7 @@ import kr.kro.moonlightmoist.shopapi.order.repository.OrderRepository;
 import kr.kro.moonlightmoist.shopapi.pointHistory.domain.PointHistory;
 import kr.kro.moonlightmoist.shopapi.pointHistory.domain.PointStatus;
 import kr.kro.moonlightmoist.shopapi.pointHistory.domain.PointUsageDetail;
+import kr.kro.moonlightmoist.shopapi.pointHistory.exception.InSufficientPointsException;
 import kr.kro.moonlightmoist.shopapi.pointHistory.repository.PointHistoryRepository;
 import kr.kro.moonlightmoist.shopapi.pointHistory.repository.PointUsageDetailRepository;
 import kr.kro.moonlightmoist.shopapi.user.domain.User;
@@ -66,7 +67,7 @@ public class PointHistoryServiceImpl implements PointHistoryService{
 
         int totalBalance = allActivePoints.stream().mapToInt(p -> p.getRemainingPoint()).sum();
         if (totalBalance < amountToUse) {
-            throw new RuntimeException("잔여 포인트가 사용하려는 포인트보다 적습니다.");
+            throw new InSufficientPointsException();
         }
 
         int remainingAmountToUse = amountToUse;
