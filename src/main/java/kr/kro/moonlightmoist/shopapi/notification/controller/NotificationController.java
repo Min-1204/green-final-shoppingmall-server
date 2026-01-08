@@ -21,10 +21,10 @@ public class NotificationController {
 
     @PostMapping("/sms")
     public ResponseEntity<String> sendSmsMessage(@RequestBody SmsRequest req) {
-//        notificationService.sendBatchSmsMessage(req.getUserIds(), req.getMessage());
+        notificationService.sendBatchSmsMessage(req.getUserIds(), req.getMessage());
 
-        throw new SmsNotReceivedException();
+//        throw new SmsNotReceivedException();
 
-//        return ResponseEntity.ok("ok");
+        return ResponseEntity.ok("ok");
     }
 }
