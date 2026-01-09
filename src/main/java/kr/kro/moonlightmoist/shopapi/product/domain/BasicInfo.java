@@ -13,7 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 public class BasicInfo {
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = false, nullable = false)
     private String productName;
 
     @Column(unique = false, nullable = true)
