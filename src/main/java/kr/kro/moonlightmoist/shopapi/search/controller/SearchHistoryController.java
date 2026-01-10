@@ -11,6 +11,7 @@ import kr.kro.moonlightmoist.shopapi.search.service.SearchHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -63,12 +64,18 @@ public class SearchHistoryController {
     ) {
         log.info("keyword => {}, page => {}, size => {}", keyword, page, size);
 
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("Product Search"); // 측정 시작
+
         ProductSearchCondition condition = new ProductSearchCondition();
         condition.setSearchKeywords(keyword);
 
         PageRequestDTO pageRequest = PageRequestDTO.builder().page(page).size(size).build();
 
         PageResponseDTO<ProductResForList> result = productService.searchProductsByConditionWithPaging(condition, pageRequest);
+
+        stopWatch.stop(); // 측정 종료
+        log.info(stopWatch.prettyPrint()); // 결과 출력 (총 시간 및 상세 내역)
 
         return ResponseEntity.ok(result);
     }

@@ -134,7 +134,7 @@ public class ProductController {
             @ModelAttribute PageRequestDTO pageRequest
             ) {
         StopWatch stopWatch = new StopWatch();
-        stopWatch.start("Product Search"); // 측정 시작
+        stopWatch.start("Product List By Category Search"); // 측정 시작
 
         PageResponseDTO<ProductResForList> pageResponse = productService.searchProductsByCategory(depth3CategoryIds, brandId, pageRequest);
 
